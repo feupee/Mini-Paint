@@ -1,24 +1,28 @@
-from config import LARGURA, ALTURA
+import pygame
+
 
 def criar_canvas(largura, altura, cor_fundo):
-    pass
+    """
+    Cria uma superfície separada para desenhar.
 
+    Essa superfície funciona como a área de desenho do Mini Paint.
+    Tudo que for desenhado nela permanece salvo enquanto o programa estiver rodando.
+    """
 
-def dentro_do_canvas(x, y, largura=LARGURA, altura=ALTURA):
-    pass
+    # Cria uma nova superfície com a largura e altura recebidas
+    canvas = pygame.Surface((largura, altura))
 
+    # Preenche o canvas com a cor de fundo
+    canvas.fill(cor_fundo)
 
-def put_pixel(canvas, x, y, cor):
-    pass
-
-
-def get_pixel(canvas, x, y):
-    pass
-
-
-def limpar_canvas(canvas, cor_fundo):
-    pass
+    # Retorna o canvas criado
+    return canvas
 
 
 def renderizar_canvas(tela, canvas):
-    pass
+    """
+    Desenha o canvas principal dentro da janela do Pygame.
+    """
+
+    # Copia o conteúdo do canvas para a tela na posição (0, 0)
+    tela.blit(canvas, (0, 0))

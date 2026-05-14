@@ -3,11 +3,13 @@ import pygame
 from config import LARGURA, ALTURA, COR_FUNDO, COR_DESENHO, FERRAMENTA_PADRAO
 from canvas import criar_canvas, renderizar_canvas
 from eventos import tratar_mouse_down, tratar_mouse_motion, tratar_mouse_up, tratar_teclado
+from botao import desenhar_botoes_ferramentas
 
 pygame.init()
 
 tela = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Mini Paint Raster")
+
 canvas = criar_canvas(LARGURA, ALTURA, COR_FUNDO)
 
 estado = {
@@ -28,18 +30,20 @@ while estado["rodando"]:
             estado["rodando"] = False
 
         elif evento.type == pygame.MOUSEBUTTONDOWN:
-            tratar_mouse_down(evento, estado)
+            tratar_mouse_down(evento, estado, canvas)
 
         elif evento.type == pygame.MOUSEMOTION:
-            tratar_mouse_motion(evento, estado)
+            tratar_mouse_motion(evento, estado, canvas)
 
         elif evento.type == pygame.MOUSEBUTTONUP:
-            tratar_mouse_up(evento, estado)
+            tratar_mouse_up(evento, estado, canvas)
 
         elif evento.type == pygame.KEYDOWN:
             tratar_teclado(evento, estado, canvas)
 
     renderizar_canvas(tela, canvas)
+
+    desenhar_botoes_ferramentas(tela, estado)
 
     pygame.display.update()
 
