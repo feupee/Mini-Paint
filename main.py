@@ -2,7 +2,7 @@ import pygame
 
 from config import LARGURA, ALTURA, COR_FUNDO, COR_DESENHO, FERRAMENTA_PADRAO
 from canvas import criar_canvas, renderizar_canvas
-from eventos import tratar_mouse_down, tratar_mouse_motion, tratar_mouse_up, tratar_teclado
+from eventos import tratar_mouse_down, tratar_mouse_motion, tratar_mouse_up
 from botao import desenhar_botoes_ferramentas
 
 pygame.init()
@@ -38,8 +38,7 @@ while estado["rodando"]:
         elif evento.type == pygame.MOUSEBUTTONUP:
             tratar_mouse_up(evento, estado, canvas)
 
-        elif evento.type == pygame.KEYDOWN:
-            tratar_teclado(evento, estado, canvas)
+        
 
     renderizar_canvas(tela, canvas)
 

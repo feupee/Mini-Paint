@@ -1,6 +1,6 @@
 import pygame
 
-from algoritmos import desenhar_linha_dda
+from algoritmos import desenhar_linha_dda, apagar_desenho
 from botao import obter_ferramenta_clicada, mouse_sobre_algum_botao
 
 
@@ -37,8 +37,9 @@ def tratar_mouse_down(evento, estado, canvas):
         estado["ponto_final"] = evento.pos
 
         # Escopo para ferramentas que desenham ao clicar
-        # if estado["ferramenta"] == "lapis":
-        #     pass
+        if estado["ferramenta"] == "lapis":
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], evento.pos, estado["cor_atual"])
+            estado["ponto_inicial"] = evento.pos
 
         # elif estado["ferramenta"] == "borracha":
         #     pass
@@ -58,11 +59,13 @@ def tratar_mouse_motion(evento, estado, canvas):
         estado["ponto_final"] = evento.pos
 
         # Escopo para ferramentas que desenham durante o movimento
-        # if estado["ferramenta"] == "lapis":
-        #     pass
+        if estado["ferramenta"] == "lapis":
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], evento.pos, estado["cor_atual"])
+            estado["ponto_inicial"] = evento.pos
 
-        # elif estado["ferramenta"] == "borracha":
-        #     pass
+        elif estado["ferramenta"] == "borracha":
+            apagar_desenho(canvas, estado["ponto_inicial"], evento.pos, estado["cor_fundo"], espessura=10)
+            estado["ponto_inicial"] = evento.pos
 
 
 def tratar_mouse_up(evento, estado, canvas):

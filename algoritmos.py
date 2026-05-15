@@ -65,3 +65,57 @@ def desenhar_linha_dda(canvas, ponto_inicial, ponto_final, cor):
         # Avança para o próximo ponto da linha
         x += incremento_x
         y += incremento_y
+
+
+def apagar_desenho(canvas, ponto_inicial, ponto_final, cor, espessura=1):
+    """
+    Apaga um desenho usando o algoritmo DDA com suporte a espessura variável.
+    """
+    # Separa as coordenadas
+    x1, y1 = ponto_inicial
+    x2, y2 = ponto_final
+
+    dx = x2 - x1
+    dy = y2 - y1
+
+    passos = max(abs(dx), abs(dy))
+    
+    # Calcula o raio de espessura para apagar
+    raio = espessura // 2
+    ajuste_par = espessura % 2
+
+    # Caso especial: clique sem arrastar (desenha apenas o ponto/bloco inicial)
+    if passos == 0:
+        for i in range(-raio, raio + ajuste_par):
+            for j in range(-raio, raio + ajuste_par):
+                px = x1 + i
+                py = y1 + j
+                if 0 <= px < canvas.get_width() and 0 <= py < canvas.get_height():
+                    canvas.set_at((px, py), cor)
+        return
+
+    # Cálculos dos incrementos para o DDA
+    incremento_x = dx / passos
+    incremento_y = dy / passos
+
+    x = x1
+    y = y1
+
+    # Desenha a linha passo a passo
+    for _ in range(passos + 1):
+        pixel_x = round(x)
+        pixel_y = round(y)
+
+        # Loops embutidos diretamente para criar o efeito de linha mais grossa
+        for i in range(-raio, raio + ajuste_par):
+            for j in range(-raio, raio + ajuste_par):
+                px = pixel_x + i
+                py = pixel_y + j
+                
+                # Verifica as bordas do canvas para cada pixel do bloco
+                if 0 <= px < canvas.get_width() and 0 <= py < canvas.get_height():
+                    canvas.set_at((px, py), cor)
+
+        # Avança para o próximo ponto da linha
+        x += incremento_x
+        y += incremento_y
