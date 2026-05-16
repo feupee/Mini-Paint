@@ -1,6 +1,6 @@
 import pygame
 
-from algoritmos import desenhar_linha_dda, apagar_desenho
+from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado
 from botao import obter_ferramenta_clicada, mouse_sobre_algum_botao
 
 
@@ -41,8 +41,17 @@ def tratar_mouse_down(evento, estado, canvas):
             desenhar_linha_dda(canvas, estado["ponto_inicial"], evento.pos, estado["cor_atual"])
             estado["ponto_inicial"] = evento.pos
 
-        # elif estado["ferramenta"] == "borracha":
-        #     pass
+        elif estado["ferramenta"] == "borracha":
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], evento.pos, estado["cor_fundo"], espessura=10)
+            estado["ponto_inicial"] = evento.pos
+            
+        elif estado["ferramenta"] == "preenchimento":
+            ponto = evento.pos
+            cor_original = tuple(canvas.get_at(ponto)[:3])
+            cor_nova = tuple(estado["cor_atual"][:3])
+            if cor_original != cor_nova:
+                visitado = vizinhos_8conectado(canvas, ponto, cor_original)
+                pinta_8conectado(canvas, visitado, cor_nova)
 
 
 def tratar_mouse_motion(evento, estado, canvas):
@@ -64,7 +73,7 @@ def tratar_mouse_motion(evento, estado, canvas):
             estado["ponto_inicial"] = evento.pos
 
         elif estado["ferramenta"] == "borracha":
-            apagar_desenho(canvas, estado["ponto_inicial"], evento.pos, estado["cor_fundo"], espessura=10)
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], evento.pos, estado["cor_fundo"], espessura=10)
             estado["ponto_inicial"] = evento.pos
 
 
@@ -109,9 +118,8 @@ def tratar_mouse_up(evento, estado, canvas):
         # elif estado["ferramenta"] == "circulo":
         #     pass
 
-        # elif estado["ferramenta"] == "preenchimento":
-        #     pass
 
+            
         # Limpa os pontos depois de finalizar o desenho
         estado["ponto_inicial"] = None
         estado["ponto_final"] = None
