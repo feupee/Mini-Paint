@@ -1,6 +1,6 @@
 import pygame
 
-from algoritmos import desenhar_linha_dda
+from algoritmos import desenhar_circulo, desenhar_linha_dda, desenhar_quadrado
 from botao import obter_ferramenta_clicada, mouse_sobre_algum_botao
 
 
@@ -92,7 +92,23 @@ def tratar_mouse_up(evento, estado, canvas):
                 estado["cor_atual"]
             )
 
-        # Escopo para futuras ferramentas
+        # Ferramenta retangulo
+        elif estado["ferramenta"] == "retangulo":
+            desenhar_quadrado(
+                canvas,
+                estado["ponto_inicial"],
+                estado["ponto_final"],
+                estado["cor_atual"]
+            )
+
+        elif estado["ferramenta"] == "circulo":
+             desenhar_circulo(
+                 canvas,
+                 estado["ponto_inicial"][0],
+                 estado["ponto_inicial"][1],
+                 max(abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]), abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])),
+                 estado["cor_atual"]
+             )
 
         # elif estado["ferramenta"] == "lapis":
         #     pass
@@ -100,11 +116,7 @@ def tratar_mouse_up(evento, estado, canvas):
         # elif estado["ferramenta"] == "borracha":
         #     pass
 
-        # elif estado["ferramenta"] == "retangulo":
-        #     pass
 
-        # elif estado["ferramenta"] == "circulo":
-        #     pass
 
         # elif estado["ferramenta"] == "preenchimento":
         #     pass
@@ -112,3 +124,7 @@ def tratar_mouse_up(evento, estado, canvas):
         # Limpa os pontos depois de finalizar o desenho
         estado["ponto_inicial"] = None
         estado["ponto_final"] = None
+
+
+def tratar_teclado(evento, estado, canvas):
+    pass
