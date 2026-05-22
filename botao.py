@@ -233,14 +233,13 @@ def desenhar_menu(tela):
         (config.LARGURA, config.MENU_ALTURA - 1)
     )
 
-    fonte_menu = fonte_classica(14)
+    fonte_menu = fonte_classica(18)
 
     x_menu = 8
     for menu in config.MENU_OPCOES:
         texto_menu = fonte_menu.render(menu, True, config.COR_PRETO)
         tela.blit(texto_menu, (x_menu, 5))
         x_menu += texto_menu.get_width() + 18
-
 
 def desenhar_area_ferramentas(tela):
     """
@@ -502,6 +501,145 @@ def desenhar_barra_status(tela):
     tela.blit(texto_coord, (caixa_coord.x + 5, caixa_coord.y + 4))
     tela.blit(texto_tamanho, (caixa_tamanho.x + 5, caixa_tamanho.y + 4))
 
+ALTURA_BARRA_JANELA = 24
+
+
+def obter_rect_barra_janela(tela):
+    largura = tela.get_width()
+    return pygame.Rect(0, 0, largura, ALTURA_BARRA_JANELA)
+
+
+def obter_rect_botao_minimizar(tela):
+    largura = tela.get_width()
+    return pygame.Rect(largura - 64, 3, 18, 18)
+
+
+def obter_rect_botao_maximizar(tela):
+    largura = tela.get_width()
+    return pygame.Rect(largura - 43, 3, 18, 18)
+
+
+def obter_rect_botao_fechar(tela):
+    largura = tela.get_width()
+    return pygame.Rect(largura - 22, 3, 18, 18)
+
+
+def desenhar_botao_janela_win98(tela, rect, tipo, pressionado=False, desativado=False):
+    # Corpo cinza do botão
+    pygame.draw.rect(tela, (192, 192, 192), rect)
+
+    if pressionado:
+        # Efeito afundado
+        pygame.draw.line(tela, (64, 64, 64), rect.topleft, rect.topright)
+        pygame.draw.line(tela, (64, 64, 64), rect.topleft, rect.bottomleft)
+
+        pygame.draw.line(tela, (255, 255, 255), rect.bottomleft, rect.bottomright)
+        pygame.draw.line(tela, (255, 255, 255), rect.topright, rect.bottomright)
+    else:
+        # Efeito normal elevado
+        pygame.draw.line(tela, (255, 255, 255), rect.topleft, rect.topright)
+        pygame.draw.line(tela, (255, 255, 255), rect.topleft, rect.bottomleft)
+
+        pygame.draw.line(tela, (64, 64, 64), rect.bottomleft, rect.bottomright)
+        pygame.draw.line(tela, (64, 64, 64), rect.topright, rect.bottomright)
+
+    # Borda interna
+    pygame.draw.rect(tela, (128, 128, 128), rect, 1)
+
+    deslocamento = 1 if pressionado else 0
+
+    if tipo == "fechar":
+        desenhar_icone_fechar_win98(tela, rect, deslocamento, desativado)
+
+    elif tipo == "minimizar":
+        desenhar_icone_minimizar_win98(tela, rect, deslocamento, desativado)
+
+    elif tipo == "maximizar":
+        desenhar_icone_maximizar_win98(tela, rect, deslocamento, desativado)
+
+
+def desenhar_icone_fechar_win98(tela, rect, deslocamento=0, desativado=False):
+    x = rect.x + deslocamento
+    y = rect.y + deslocamento
+
+    cor = (128, 128, 128) if desativado else (0, 0, 0)
+
+    pygame.draw.line(tela, cor, (x + 5, y + 5), (x + 12, y + 12), 2)
+    pygame.draw.line(tela, cor, (x + 12, y + 5), (x + 5, y + 12), 2)
+
+
+def desenhar_icone_minimizar_win98(tela, rect, deslocamento=0, desativado=False):
+    x = rect.x + deslocamento
+    y = rect.y + deslocamento
+
+    cor = (128, 128, 128) if desativado else (0, 0, 0)
+
+    pygame.draw.rect(tela, cor, (x + 4, y + 13, 9, 2))
+
+
+def desenhar_icone_maximizar_win98(tela, rect, deslocamento=0, desativado=False):
+    x = rect.x + deslocamento
+    y = rect.y + deslocamento
+
+    cor = (128, 128, 128) if desativado else (0, 0, 0)
+
+    # Ícone de maximizar estilo Windows 98
+    pygame.draw.rect(tela, cor, (x + 4, y + 4, 10, 10), 1)
+    pygame.draw.line(tela, cor, (x + 5, y + 6), (x + 13, y + 6), 1)
+
+
+def desenhar_barra_superior(tela, estado):
+    largura = tela.get_width()
+
+    rect_minimizar = obter_rect_botao_minimizar(tela)
+    rect_maximizar = obter_rect_botao_maximizar(tela)
+    rect_fechar = obter_rect_botao_fechar(tela)
+
+    fonte_titulo = pygame.font.SysFont("Tahoma", 13, bold=True)
+
+    # Barra azul superior estilo Windows 98
+    pygame.draw.rect(tela, (0, 0, 128), (0, 0, largura, ALTURA_BARRA_JANELA))
+
+    # Linha de brilho no topo
+    pygame.draw.line(tela, (32, 32, 180), (0, 0), (largura, 0))
+
+    # Ícone do Paint no canto esquerdo
+    icone_paint = carregar_imagem(config.ICONE[0]["imagem"])
+    if icone_paint is not None:
+        tela.blit(icone_paint, (4, 4))
+
+    # Título
+    texto_titulo = fonte_titulo.render("untitled - Paint", True, (255, 255, 255))
+    tela.blit(texto_titulo, (10 + icone_paint.get_width(), 3))
+    
+
+    botao_pressionado = estado.get("botao_janela_pressionado")
+
+    # Botão minimizar
+    desenhar_botao_janela_win98(
+        tela,
+        rect_minimizar,
+        "minimizar",
+        pressionado=botao_pressionado == "minimizar"
+    )
+
+    # Botão maximizar desativado
+    desenhar_botao_janela_win98(
+        tela,
+        rect_maximizar,
+        "maximizar",
+        pressionado=False,
+        desativado=True
+    )
+
+    # Botão fechar
+    desenhar_botao_janela_win98(
+        tela,
+        rect_fechar,
+        "fechar",
+        pressionado=botao_pressionado == "fechar"
+    )
+
 
 def desenhar_interface_classica(tela, estado):
     """
@@ -515,3 +653,6 @@ def desenhar_interface_classica(tela, estado):
     desenhar_moldura_canvas(tela)
     desenhar_paleta_cores(tela, estado)
     desenhar_barra_status(tela)
+    desenhar_barra_superior(tela, estado)
+    
+

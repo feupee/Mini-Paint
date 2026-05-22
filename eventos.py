@@ -5,6 +5,7 @@ from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado
 from botao import obter_ferramenta_clicada, obter_cor_clicada, mouse_sobre_algum_botao, mouse_sobre_interface
 
 
+
 def obter_altura_barra():
     """
     Retorna a altura da barra superior.
@@ -236,3 +237,45 @@ def tratar_mouse_up(evento, estado, canvas):
         # Limpa os pontos depois de finalizar o desenho
         estado["ponto_inicial"] = None
         estado["ponto_final"] = None
+
+def carregar_cursor_png(caminho, hotspot=(0, 0)):
+    """
+    Carrega uma imagem PNG e transforma em cursor do pygame.
+    """
+
+    imagem = pygame.image.load(caminho).convert_alpha()
+    cursor = pygame.cursors.Cursor(hotspot, imagem)
+
+    return cursor
+
+def carregar_cursores():
+    cursores = {}
+
+    for ferramenta in config.FERRAMENTAS:
+
+        cursores[ferramenta["nome"]] = carregar_cursor_png(
+            ferramenta["cursor"],
+            ferramenta["hotspot"]
+        )
+
+    return cursores
+
+def atualizar_cursor(ferramenta, cursores, posicao_mouse=None):
+    """
+    Altera o cursor do mouse de acordo com a ferramenta selecionada,
+    mas somente quando o mouse está dentro da área do canvas.
+
+    Fora do canvas, o cursor volta a ser o cursor padrão do sistema.
+    """
+
+    if posicao_mouse is None:
+        posicao_mouse = pygame.mouse.get_pos()
+
+    if not ponto_janela_dentro_canvas(posicao_mouse):
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        return
+
+    if ferramenta in cursores:
+        pygame.mouse.set_cursor(cursores[ferramenta])
+    else:
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)

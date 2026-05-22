@@ -44,15 +44,15 @@ BARRA_FERRAMENTAS_LARGURA = 58
 SCROLLBAR_TAMANHO = 16
 
 # Barra de status inferior
-STATUS_ALTURA = 22
+STATUS_ALTURA = 20
 STATUS_Y = ALTURA - STATUS_ALTURA
 
 # Paleta de cores inferior
 PALETA_X = 8
-PALETA_ALTURA = 44
+PALETA_ALTURA = 55
 PALETA_Y = STATUS_Y - PALETA_ALTURA - 2
-COR_TAMANHO = 18
-COR_ESPACAMENTO = 2
+COR_TAMANHO = 20
+COR_ESPACAMENTO = 4
 
 # Área do canvas dentro da janela
 CANVAS_X = BARRA_FERRAMENTAS_X + BARRA_FERRAMENTAS_LARGURA + 8
@@ -68,32 +68,79 @@ FERRAMENTAS = [
     {
         "nome": "linha",
         "rotulo": "Linha",
-        "imagem": "img/linha.png"
+        "imagem": "img/linha.png",
+        "cursor": "img/cursor/linha.png",
+        "hotspot": (15, 15)
     },
     {
         "nome": "lapis",
         "rotulo": "Lapis",
-        "imagem": "img/lapis.png"
+        "imagem": "img/lapis.png",
+        "cursor": "img/cursor/lapis.png",
+        "hotspot": (12, 24)
     },
-    {
+    {                       
         "nome": "borracha",
         "rotulo": "Borracha",
-        "imagem": "img/borracha.png"
+        "imagem": "img/borracha.png",
+        "cursor": "img/cursor/borracha.png",
+        "hotspot": (15, 15)
     },
     {
         "nome": "retangulo",
         "rotulo": "Retângulo",
-        "imagem": "img/retangulo.png"
+        "imagem": "img/retangulo.png",
+        "cursor": "img/cursor/retangulo.png",
+        "hotspot": (21, 21)
     },
     {
         "nome": "circulo",
         "rotulo": "Círculo",
-        "imagem": "img/circulo.png"
+        "imagem": "img/circulo.png",
+        "cursor": "img/cursor/circulo.png",
+        "hotspot": (15, 15)
+    },
+    {
+        "nome": "conta-gotas",
+        "rotulo": "Conta-Gotas",
+        "imagem": "img/conta-gotas.png",
+        "cursor": "img/cursor/conta-gotas.png",
+        "hotspot": (9, 23)
     },
     {
         "nome": "preenchimento",
         "rotulo": "Preencher",
-        "imagem": "img/balde.png"
+        "imagem": "img/balde.png",
+        "cursor": "img/cursor/balde.png",
+        "hotspot": (8, 21)
+    },
+    {
+        "nome": "texto",
+        "rotulo": "Texto",
+        "imagem": "img/texto.png",
+        "cursor": "img/cursor/texto.png",
+        "hotspot": (21, 21)
+    },
+    {
+        "nome": "zoom",
+        "rotulo": "Zoom",
+        "imagem": "img/zoom.png",
+        "cursor": "img/cursor/zoom.png",
+        "hotspot": (19, 19)
+    },
+    {
+        "nome": "mouse",
+        "rotulo": "Mouse",
+        "imagem": "img/cursor.png",
+        "cursor": "img/cursor/cursor.png",
+        "hotspot": (0, 0)
+    }
+]
+
+ICONE = [
+    {
+        "nome": "paint",
+        "imagem": "img/icone.png"
     }
 ]
 
@@ -101,13 +148,13 @@ FERRAMENTAS = [
 # Configurações visuais dos botões
 BOTAO_X_INICIAL = BARRA_FERRAMENTAS_X + 4
 BOTAO_Y = BARRA_FERRAMENTAS_Y + 4
-BOTAO_LARGURA = 24
-BOTAO_ALTURA = 24
-BOTAO_ESPACAMENTO = 2
+BOTAO_LARGURA = 25
+BOTAO_ALTURA = 25
+BOTAO_ESPACAMENTO = 4
 BOTAO_COLUNAS = 2
 
 # Tamanho da imagem dentro do botão
-BOTAO_IMAGEM_TAMANHO = 18
+BOTAO_IMAGEM_TAMANHO = 15
 
 # Cores dos botões
 COR_BARRA = COR_JANELA
