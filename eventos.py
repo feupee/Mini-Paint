@@ -2,7 +2,7 @@ import pygame
 import config
 
 from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado, desenhar_circulo, desenhar_quadrado
-from botao import obter_ferramenta_clicada, mouse_sobre_algum_botao
+from botao import obter_ferramenta_clicada, obter_cor_clicada, mouse_sobre_algum_botao, mouse_sobre_interface
 
 
 def obter_altura_barra():
@@ -21,7 +21,7 @@ def mouse_sobre_barra(posicao_mouse):
     Verifica se o mouse está na área da barra superior.
     """
 
-    return posicao_mouse[1] < obter_altura_barra()
+    return posicao_mouse[1] < config.MENU_ALTURA
 
 
 def converter_posicao_para_canvas(posicao_mouse):
@@ -29,12 +29,12 @@ def converter_posicao_para_canvas(posicao_mouse):
     Converte a posição do mouse na janela para a posição correta dentro do canvas.
 
     Exemplo:
-    Se a barra tem 90 pixels de altura e o mouse está em y = 120,
-    então dentro do canvas o ponto correto é y = 30.
+    Se o canvas começa em x = 70 e y = 32, e o mouse está em (100, 80),
+    então dentro do canvas o ponto correto é (30, 48).
     """
 
     x, y = posicao_mouse
-    return (x, y - obter_altura_barra())
+    return (x - config.CANVAS_X, y - config.CANVAS_Y)
 
 
 def ponto_dentro_canvas(canvas, ponto):
@@ -45,6 +45,19 @@ def ponto_dentro_canvas(canvas, ponto):
 
     x, y = ponto
     return 0 <= x < canvas.get_width() and 0 <= y < canvas.get_height()
+
+
+def ponto_janela_dentro_canvas(posicao_mouse):
+    """
+    Verifica se a posição do mouse, ainda em coordenadas da janela,
+    está dentro da área visível do canvas.
+    """
+
+    x, y = posicao_mouse
+    return (
+        config.CANVAS_X <= x < config.CANVAS_X + config.CANVAS_LARGURA and
+        config.CANVAS_Y <= y < config.CANVAS_Y + config.CANVAS_ALTURA
+    )
 
 
 def tratar_mouse_down(evento, estado, canvas):
@@ -68,6 +81,22 @@ def tratar_mouse_down(evento, estado, canvas):
             estado["ponto_inicial"] = None
             estado["ponto_final"] = None
 
+            return
+
+        cor_clicada = obter_cor_clicada(evento.pos)
+
+        # Se clicou em alguma cor da paleta
+        if cor_clicada is not None:
+            estado["cor_atual"] = cor_clicada
+
+            estado["mouse_pressionado"] = False
+            estado["ponto_inicial"] = None
+            estado["ponto_final"] = None
+
+            return
+
+        # Evita desenhar em cima da área da interface
+        if mouse_sobre_interface(evento.pos):
             return
 
         # Evita desenhar em cima da área da barra superior
@@ -116,6 +145,9 @@ def tratar_mouse_motion(evento, estado, canvas):
 
     if estado["mouse_pressionado"]:
 
+        if not ponto_janela_dentro_canvas(evento.pos):
+            return
+
         ponto_canvas = converter_posicao_para_canvas(evento.pos)
 
         if not ponto_dentro_canvas(canvas, ponto_canvas):
@@ -145,6 +177,12 @@ def tratar_mouse_up(evento, estado, canvas):
         # ou em uma área que não deve gerar desenho
         if estado["ponto_inicial"] is None:
             estado["mouse_pressionado"] = False
+            estado["ponto_final"] = None
+            return
+
+        if not ponto_janela_dentro_canvas(evento.pos):
+            estado["mouse_pressionado"] = False
+            estado["ponto_inicial"] = None
             estado["ponto_final"] = None
             return
 
