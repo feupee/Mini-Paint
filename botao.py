@@ -126,6 +126,12 @@ def desenhar_botoes_ferramentas(tela, estado):
 
     fonte = pygame.font.SysFont(None, 18)
 
+    pygame.draw.rect(
+        tela,
+        config.COR_BARRA,
+        (0, 0, config.LARGURA, config.ALTURA_BARRA)
+    )
+
     for botao in botoes:
         retangulo = botao["retangulo"]
 
@@ -150,8 +156,30 @@ def desenhar_botoes_ferramentas(tela, estado):
         # Desenha o fundo do botão
         pygame.draw.rect(tela, cor, retangulo)
 
-        # Desenha a borda do botão
-        pygame.draw.rect(tela, config.COR_BOTAO_BORDA, retangulo, 2)
+        # Desenha a borda do botão estilo Windows clássico
+        if ferramenta_ativa or (mouse_em_cima and mouse_pressionado):
+            # Efeito afundado
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_ESCURA, retangulo.topleft, retangulo.topright)
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_ESCURA, retangulo.topleft, retangulo.bottomleft)
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_CLARA, retangulo.bottomleft, retangulo.bottomright)
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_CLARA, retangulo.topright, retangulo.bottomright)
+        else:
+            # Efeito elevado
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_CLARA, retangulo.topleft, retangulo.topright)
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_CLARA, retangulo.topleft, retangulo.bottomleft)
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_ESCURA, retangulo.bottomleft, retangulo.bottomright)
+            pygame.draw.line(tela, config.COR_BOTAO_BORDA_ESCURA, retangulo.topright, retangulo.bottomright)
+
+            fonte_menu = pygame.font.SysFont("arial", 14)
+
+            menus = ["Arquivo", "Editar", "Exibir", "Imagem", "Cores", "Ajuda"]
+
+            x_menu = 8
+            for menu in menus:
+                texto_menu = fonte_menu.render(menu, True, (0, 0, 0))
+                tela.blit(texto_menu, (x_menu, 6))
+                x_menu += texto_menu.get_width() + 18
+
 
         # Tenta carregar a imagem do botão
         imagem = carregar_imagem(botao["imagem"])

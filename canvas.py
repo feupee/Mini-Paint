@@ -1,5 +1,5 @@
 import pygame
-
+import config
 
 def criar_canvas(largura, altura, cor_fundo):
     """
@@ -26,3 +26,4 @@ def renderizar_canvas(tela, canvas):
 
     # Copia o conteúdo do canvas para a tela na posição (0, 0)
     tela.blit(canvas, (0, 0))
+    tela.blit(canvas, (0, config.ALTURA_BARRA))

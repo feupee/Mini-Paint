@@ -14,6 +14,9 @@ COR_DESENHO = (0, 0, 0)
 FERRAMENTA_PADRAO = "linha"
 
 
+ALTURA_BARRA = 90
+
+
 # Lista com as 6 ferramentas do programa
 # O campo "imagem" pode receber o caminho de uma imagem PNG, JPG etc.
 # Se a imagem não existir, o botão mostra o texto da ferramenta.
@@ -52,20 +55,24 @@ FERRAMENTAS = [
 
 
 # Configurações visuais dos botões
-BOTAO_X_INICIAL = 10
-BOTAO_Y = 10
-BOTAO_LARGURA = 90
-BOTAO_ALTURA = 50
-BOTAO_ESPACAMENTO = 8
+BOTAO_X_INICIAL = 8
+BOTAO_Y = 28
+BOTAO_LARGURA = 36
+BOTAO_ALTURA = 36
+BOTAO_ESPACAMENTO = 4
 
 # Tamanho da imagem dentro do botão
-BOTAO_IMAGEM_TAMANHO = 40
+BOTAO_IMAGEM_TAMANHO = 50
 
 # Cores dos botões
-COR_BOTAO = (220, 220, 220)
-COR_BOTAO_HOVER = (200, 200, 200)
-COR_BOTAO_CLICADO = (180, 180, 180)
-COR_BOTAO_ATIVO = (160, 200, 255)
+COR_BARRA = (192, 192, 192)
+COR_BOTAO = (212, 208, 200)
+COR_BOTAO_HOVER = (230, 230, 230)
+COR_BOTAO_CLICADO = (160, 160, 160)
+COR_BOTAO_ATIVO = (255, 255, 255)
+
+COR_BOTAO_BORDA_CLARA = (255, 255, 255)
+COR_BOTAO_BORDA_ESCURA = (64, 64, 64)
 
 # Cores da borda e do texto
 COR_BOTAO_BORDA = (0, 0, 0)

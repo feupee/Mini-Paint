@@ -130,3 +130,42 @@ def pinta_8conectado(canvas, visitado, cor):
     for x, y in visitado:
         canvas.set_at((x, y), cor)
 
+
+def desenhar_quadrado(canvas, p1, p2, cor):
+    x1, y1 = p1
+    x2, y2 = p2
+    # calculando os outros dois vértices
+    p3 = (x1, y2)
+    p4 = (x2, y1)
+    # desenhando linhas entre os quatro pontos
+    
+    desenhar_linha_dda(canvas, p1, p3, cor)
+    desenhar_linha_dda(canvas, p3, p2, cor)
+    desenhar_linha_dda(canvas, p2, p4, cor)
+    desenhar_linha_dda(canvas, p4, p1, cor)
+
+# https://www.youtube.com/watch?v=hpiILbMkF9w
+def desenhar_circulo(canvas, cx, cy, raio, cor):
+    x = 0
+    y = -raio
+    p = -raio
+    while x < -y:
+        if p > 0:
+            y += 1
+            p += 2*(x+y) + 1
+        else:
+            p += 2*x + 1
+
+        #plota os 8 lados do círculo
+        canvas.set_at((cx + x, cy + y), cor)
+        canvas.set_at((cx - x, cy + y), cor)
+        canvas.set_at((cx + x, cy - y), cor)
+        canvas.set_at((cx - x, cy - y), cor)
+        canvas.set_at((cx + y, cy + x), cor)
+        canvas.set_at((cx + y, cy - x), cor)
+        canvas.set_at((cx - y, cy + x), cor)
+        canvas.set_at((cx - y, cy - x), cor)
+        x += 1
+
+
+
