@@ -282,4 +282,8 @@ def atualizar_cursor(ferramenta, cursores, posicao_mouse=None):
 
 
 def tratar_teclado(evento, estado, canvas):
+    """
+    Placeholder para futuros atalhos e eventos de teclado.
+    """
+
     pass
