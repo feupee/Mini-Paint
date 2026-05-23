@@ -281,9 +281,14 @@ def atualizar_cursor(ferramenta, cursores, posicao_mouse=None):
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
 
-def tratar_teclado(evento, estado, canvas):
+def tratar_teclado(_evento, _estado, _canvas):
     """
     Placeholder para futuros atalhos e eventos de teclado.
+
+    Args:
+        _evento: Evento de teclado recebido pelo pygame.
+        _estado: Estado atual da aplicação.
+        _canvas: Superfície de desenho que poderá ser alterada futuramente.
     """
 
     pass
