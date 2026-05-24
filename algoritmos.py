@@ -130,7 +130,6 @@ def pinta_8conectado(canvas, visitado, cor):
     for x, y in visitado:
         canvas.set_at((x, y), cor)
 
-
 def desenhar_quadrado(canvas, p1, p2, cor):
     x1, y1 = p1
     x2, y2 = p2
@@ -166,6 +165,5 @@ def desenhar_circulo(canvas, cx, cy, raio, cor):
         canvas.set_at((cx - y, cy + x), cor)
         canvas.set_at((cx - y, cy - x), cor)
         x += 1
-
 
 
