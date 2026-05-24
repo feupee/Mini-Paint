@@ -1,8 +1,8 @@
-# Largura da janela do programa
-LARGURA = 800
+# Largura fixa do canvas
+CANVAS_LARGURA = 800
 
-# Altura da janela do programa
-ALTURA = 600
+# Altura fixa do canvas
+CANVAS_ALTURA = 600
 
 # Cor de fundo do canvas
 COR_FUNDO = (255, 255, 255)
@@ -45,20 +45,28 @@ SCROLLBAR_TAMANHO = 16
 
 # Barra de status inferior
 STATUS_ALTURA = 20
-STATUS_Y = ALTURA - STATUS_ALTURA
 
 # Paleta de cores inferior
 PALETA_X = 8
 PALETA_ALTURA = 55
-PALETA_Y = STATUS_Y - PALETA_ALTURA - 2
 COR_TAMANHO = 20
 COR_ESPACAMENTO = 4
 
 # Área do canvas dentro da janela
+# CANVAS_LARGURA e CANVAS_ALTURA são fixos: 800x600.
+# A janela é calculada em volta do canvas para acomodar ferramentas,
+# paleta, barra de status e barras falsas de rolagem.
 CANVAS_X = BARRA_FERRAMENTAS_X + BARRA_FERRAMENTAS_LARGURA + 8
 CANVAS_Y = MENU_ALTURA + 8
-CANVAS_LARGURA = LARGURA - CANVAS_X - 28
-CANVAS_ALTURA = PALETA_Y - CANVAS_Y - SCROLLBAR_TAMANHO - 12
+
+# Largura da janela do programa
+LARGURA = CANVAS_X + CANVAS_LARGURA + SCROLLBAR_TAMANHO + 12
+
+# Altura da janela do programa
+ALTURA = CANVAS_Y + CANVAS_ALTURA + SCROLLBAR_TAMANHO + 12 + PALETA_ALTURA + 2 + STATUS_ALTURA
+
+STATUS_Y = ALTURA - STATUS_ALTURA
+PALETA_Y = STATUS_Y - PALETA_ALTURA - 2
 
 
 # Lista com as 6 ferramentas do programa
