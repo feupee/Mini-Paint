@@ -326,28 +326,78 @@ def desenhar_botoes_ferramentas(tela, estado):
 
             tela.blit(texto, texto_rect)
 
+def obter_rect_painel_opcoes():
+    """
+    Retorna o retângulo do painel de opções da ferramenta.
+    """
+
+    return pygame.Rect(
+        config.BOTAO_X_INICIAL,
+        config.BOTAO_Y + 4 * (config.BOTAO_ALTURA + config.BOTAO_ESPACAMENTO),
+        config.BARRA_FERRAMENTAS_LARGURA - 8,
+        88
+    )
+
 
 def desenhar_painel_opcoes_ferramenta(tela, estado):
     """
     Desenha um pequeno painel decorativo abaixo dos botões, parecido com o Paint clássico.
     """
 
-    painel = pygame.Rect(
-        config.BOTAO_X_INICIAL,
-        config.BOTAO_Y + 4 * (config.BOTAO_ALTURA + config.BOTAO_ESPACAMENTO),
-        config.BARRA_FERRAMENTAS_LARGURA - 8,
-        52
-    )
+    painel = obter_rect_painel_opcoes()
 
     pygame.draw.rect(tela, config.COR_JANELA, painel)
-    desenhar_borda_rebaixada(tela, painel)
 
-    fonte = fonte_classica(11)
-    texto = fonte.render(estado["ferramenta"], True, config.COR_PRETO)
-    texto_rect = texto.get_rect(center=painel.center)
-    tela.blit(texto, texto_rect)
+    fonte = pygame.font.SysFont(None, 15)
 
+    # Texto Espessura
+    texto_espessura = fonte.render("Espessura", True, config.COR_TEXTO)
+    tela.blit(texto_espessura, (painel.x + 0, painel.y + 5))
 
+    # Botões de espessura
+    botoes_espessura = obter_botoes_espessura()
+
+    for botao in botoes_espessura:
+        rect = botao["rect"]
+        valor = botao["valor"]
+
+        if estado["espessura"] == valor:
+            cor = config.COR_BOTAO_PRESSIONADO
+        else:
+            cor = config.COR_BOTAO
+
+        pygame.draw.rect(tela, cor, rect)
+        pygame.draw.rect(tela, config.COR_BORDA, rect, 1)
+
+        texto_valor = fonte.render(str(valor), True, config.COR_TEXTO)
+
+        texto_x = rect.centerx - texto_valor.get_width() // 2
+        texto_y = rect.centery - texto_valor.get_height() // 2
+
+        tela.blit(texto_valor, (texto_x, texto_y))
+
+    # Botões de preenchimento aparecem somente para formas
+    if estado["ferramenta"] in ["retangulo", "circulo"]:
+
+        texto_forma = fonte.render("Forma", True, config.COR_TEXTO)
+        tela.blit(texto_forma, (painel.x + 0, painel.y + 55))
+
+        botoes_preenchido = obter_botoes_preenchido()
+
+        for botao in botoes_preenchido:
+            rect = botao["rect"]
+            valor = botao["valor"]
+
+            if estado["preenchido"] == valor:
+                cor = config.COR_BOTAO_PRESSIONADO
+            else:
+                cor = config.COR_BOTAO
+
+            pygame.draw.rect(tela, cor, rect)
+            pygame.draw.rect(tela, config.COR_BORDA, rect, 1)
+
+            desenhar_icone_preenchido(tela, rect, valor)
+    
 def desenhar_moldura_canvas(tela):
     """
     Desenha a moldura e as barras falsas de rolagem da área de desenho.
@@ -639,6 +689,99 @@ def desenhar_barra_superior(tela, estado):
         "fechar",
         pressionado=botao_pressionado == "fechar"
     )
+
+def obter_botoes_espessura():
+    """
+    Retorna os botões de espessura alinhados 2 por 2,
+    na parte superior do painel.
+    """
+
+    painel = obter_rect_painel_opcoes()
+
+    valores = [1, 2, 4, 6]
+    botoes = []
+
+    largura_botao = 20
+    altura_botao = 14
+    espacamento_x = 4
+    espacamento_y = 3
+
+    x_inicial = painel.x + 4
+    y_inicial = painel.y + 20
+
+    for indice, valor in enumerate(valores):
+        coluna = indice % 2
+        linha = indice // 2
+
+        rect = pygame.Rect(
+            x_inicial + coluna * (largura_botao + espacamento_x),
+            y_inicial + linha * (altura_botao + espacamento_y),
+            largura_botao,
+            altura_botao
+        )
+
+        botoes.append({
+            "rect": rect,
+            "valor": valor
+        })
+
+    return botoes
+
+def obter_botoes_preenchido():
+    """
+    Retorna os botões de preenchimento abaixo dos botões de espessura.
+    False = apenas contorno
+    True = preenchido
+    """
+
+    painel = obter_rect_painel_opcoes()
+
+    largura_botao = 20
+    altura_botao = 14
+    espacamento_x = 4
+
+    x_inicial = painel.x + 4
+    y_inicial = painel.y + 68
+
+    botoes = [
+        {
+            "rect": pygame.Rect(
+                x_inicial,
+                y_inicial,
+                largura_botao,
+                altura_botao
+            ),
+            "valor": False
+        },
+        {
+            "rect": pygame.Rect(
+                x_inicial + largura_botao + espacamento_x,
+                y_inicial,
+                largura_botao,
+                altura_botao
+            ),
+            "valor": True
+        }
+    ]
+
+    return botoes
+
+def desenhar_icone_preenchido(tela, rect, preenchido):
+    """
+    Desenha o ícone de contorno ou preenchido dentro do botão.
+    """
+
+    icone = pygame.Rect(
+        rect.x + 5,
+        rect.y + 3,
+        rect.width - 10,
+        rect.height - 6
+    )
+
+    if preenchido:
+        pygame.draw.rect(tela, config.COR_TEXTO, icone)
+    else:
+        pygame.draw.rect(tela, config.COR_TEXTO, icone, 1)
 
 
 def desenhar_interface_classica(tela, estado):

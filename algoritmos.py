@@ -1,4 +1,4 @@
-def desenhar_linha_dda(canvas, ponto_inicial, ponto_final, cor, espessura=1):
+def desenhar_linha_dda(canvas, ponto_inicial, ponto_final, cor, espessura):
     """
     Desenha uma linha usando o algoritmo DDA com uma espessura especificada.
 
@@ -130,7 +130,8 @@ def pinta_8conectado(canvas, visitado, cor):
     for x, y in visitado:
         canvas.set_at((x, y), cor)
 
-def desenhar_quadrado(canvas, p1, p2, cor):
+
+def desenhar_retangulo(canvas, p1, p2, cor, espessura):
     x1, y1 = p1
     x2, y2 = p2
     # calculando os outros dois vértices
@@ -138,32 +139,56 @@ def desenhar_quadrado(canvas, p1, p2, cor):
     p4 = (x2, y1)
     # desenhando linhas entre os quatro pontos
     
-    desenhar_linha_dda(canvas, p1, p3, cor)
-    desenhar_linha_dda(canvas, p3, p2, cor)
-    desenhar_linha_dda(canvas, p2, p4, cor)
-    desenhar_linha_dda(canvas, p4, p1, cor)
+    desenhar_linha_dda(canvas, p1, p3, cor, espessura)
+    desenhar_linha_dda(canvas, p3, p2, cor, espessura)
+    desenhar_linha_dda(canvas, p2, p4, cor, espessura)
+    desenhar_linha_dda(canvas, p4, p1, cor, espessura)
 
 # https://www.youtube.com/watch?v=hpiILbMkF9w
-def desenhar_circulo(canvas, cx, cy, raio, cor):
-    x = 0
-    y = -raio
-    p = -raio
-    while x < -y:
-        if p > 0:
-            y += 1
-            p += 2*(x+y) + 1
-        else:
-            p += 2*x + 1
+def desenhar_circulo(canvas, cx, cy, raio, cor, espessura):
+    """
+    Desenha um círculo usando o algoritmo do ponto médio.
+    A espessura é feita desenhando vários círculos concêntricos.
+    """
 
-        #plota os 8 lados do círculo
-        canvas.set_at((cx + x, cy + y), cor)
-        canvas.set_at((cx - x, cy + y), cor)
-        canvas.set_at((cx + x, cy - y), cor)
-        canvas.set_at((cx - x, cy - y), cor)
-        canvas.set_at((cx + y, cy + x), cor)
-        canvas.set_at((cx + y, cy - x), cor)
-        canvas.set_at((cx - y, cy + x), cor)
-        canvas.set_at((cx - y, cy - x), cor)
-        x += 1
+    for deslocamento in range(espessura):
+        raio_atual = raio - deslocamento
+
+        if raio_atual <= 0:
+            break
+
+        x = 0
+        y = -raio_atual
+        p = -raio_atual
+
+        while x < -y:
+            if p > 0:
+                y += 1
+                p += 2 * (x + y) + 1
+            else:
+                p += 2 * x + 1
+
+            #plota os 8 lados do círculo
+            plotar_ponto_seguro(canvas, cx + x, cy + y, cor)
+            plotar_ponto_seguro(canvas, cx - x, cy + y, cor)
+            plotar_ponto_seguro(canvas, cx + x, cy - y, cor)
+            plotar_ponto_seguro(canvas, cx - x, cy - y, cor)
+            plotar_ponto_seguro(canvas, cx + y, cy + x, cor)
+            plotar_ponto_seguro(canvas, cx + y, cy - x, cor)
+            plotar_ponto_seguro(canvas, cx - y, cy + x, cor)
+            plotar_ponto_seguro(canvas, cx - y, cy - x, cor)
+
+            x += 1
+
+def plotar_ponto_seguro(canvas, x, y, cor):
+    """
+    Plota um ponto apenas se ele estiver dentro dos limites do canvas.
+    """
+
+    largura = canvas.get_width()
+    altura = canvas.get_height()
+
+    if 0 <= x < largura and 0 <= y < altura:
+        canvas.set_at((x, y), cor)
 
 

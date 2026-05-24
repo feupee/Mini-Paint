@@ -92,7 +92,7 @@ FERRAMENTAS = [
         "rotulo": "Borracha",
         "imagem": "img/borracha.png",
         "cursor": "img/cursor/borracha.png",
-        "hotspot": (15, 15)
+        "hotspot": (5, 5)
     },
     {
         "nome": "retangulo",
@@ -128,20 +128,6 @@ FERRAMENTAS = [
         "imagem": "img/texto.png",
         "cursor": "img/cursor/texto.png",
         "hotspot": (21, 21)
-    },
-    {
-        "nome": "zoom",
-        "rotulo": "Zoom",
-        "imagem": "img/zoom.png",
-        "cursor": "img/cursor/zoom.png",
-        "hotspot": (19, 19)
-    },
-    {
-        "nome": "mouse",
-        "rotulo": "Mouse",
-        "imagem": "img/cursor.png",
-        "cursor": "img/cursor/cursor.png",
-        "hotspot": (0, 0)
     }
 ]
 
@@ -170,6 +156,7 @@ COR_BOTAO = (212, 208, 200)
 COR_BOTAO_HOVER = (230, 230, 230)
 COR_BOTAO_CLICADO = (160, 160, 160)
 COR_BOTAO_ATIVO = COR_BRANCO
+COR_BOTAO_PRESSIONADO = (180, 180, 180)
 
 COR_BOTAO_BORDA_CLARA = COR_BRANCO
 COR_BOTAO_BORDA_ESCURA = COR_CINZA_ESCURO
@@ -177,6 +164,8 @@ COR_BOTAO_BORDA_ESCURA = COR_CINZA_ESCURO
 # Cores da borda e do texto
 COR_BOTAO_BORDA = COR_PRETO
 COR_BOTAO_TEXTO = COR_PRETO
+COR_BORDA = (128, 128, 128)
+COR_TEXTO = (0, 0, 0)
 
 # Paleta no estilo do Paint clássico
 CORES_PALETA = [

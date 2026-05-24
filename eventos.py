@@ -1,8 +1,9 @@
 import pygame
 import config
 
-from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado, desenhar_circulo, desenhar_quadrado
+from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado, desenhar_circulo, desenhar_retangulo
 from botao import obter_ferramenta_clicada, obter_cor_clicada, mouse_sobre_algum_botao, mouse_sobre_interface
+
 
 
 def obter_altura_barra():
@@ -119,11 +120,11 @@ def tratar_mouse_down(evento, estado, canvas):
 
         # Escopo para ferramentas que desenham ao clicar
         if estado["ferramenta"] == "lapis":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_atual"])
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_atual"], estado["espessura"])
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "borracha":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_fundo"], espessura=10)
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_fundo"], estado["espessura"])
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "preenchimento":
@@ -133,6 +134,10 @@ def tratar_mouse_down(evento, estado, canvas):
             if cor_original != cor_nova:
                 visitado = vizinhos_8conectado(canvas, ponto, cor_original)
                 pinta_8conectado(canvas, visitado, cor_nova)
+    
+        elif estado["ferramenta"] == "conta-gotas":
+            cor_clicada = canvas.get_at(ponto_canvas)
+            estado["cor_atual"] = cor_clicada
 
 
 def tratar_mouse_motion(evento, estado, canvas):
@@ -162,7 +167,7 @@ def tratar_mouse_motion(evento, estado, canvas):
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "borracha":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_fundo"], espessura=10)
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_fundo"], estado["espessura"])
             estado["ponto_inicial"] = ponto_canvas
 
 
@@ -204,26 +209,11 @@ def tratar_mouse_up(evento, estado, canvas):
                 canvas,
                 estado["ponto_inicial"],
                 estado["ponto_final"],
-                estado["cor_atual"]
+                estado["cor_atual"], 
+                estado["espessura"]
             )
 
-        # Ferramenta retangulo
-        elif estado["ferramenta"] == "retangulo":
-            desenhar_quadrado(
-                canvas,
-                estado["ponto_inicial"],
-                estado["ponto_final"],
-                estado["cor_atual"]
-            )
-
-        elif estado["ferramenta"] == "circulo":
-             desenhar_circulo(
-                 canvas,
-                 estado["ponto_inicial"][0],
-                 estado["ponto_inicial"][1],
-                 max(abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]), abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])),
-                 estado["cor_atual"]
-             )
+        # Escopo para futuras ferramentas
 
         # elif estado["ferramenta"] == "lapis":
         #     pass
@@ -231,8 +221,40 @@ def tratar_mouse_up(evento, estado, canvas):
         # elif estado["ferramenta"] == "borracha":
         #     pass
 
-        # elif estado["ferramenta"] == "preenchimento":
-        #     pass
+        # Ferramenta retangulo
+        elif estado["ferramenta"] == "retangulo" and estado["preenchido"] is False:
+            desenhar_retangulo(
+                canvas,
+                estado["ponto_inicial"],
+                estado["ponto_final"],
+                estado["cor_atual"], 
+                estado["espessura"]
+            )
+
+        elif estado["ferramenta"] == "retangulo" and estado["preenchido"] is True:
+            ponto = ponto_canvas
+            cor_original = tuple(canvas.get_at(ponto)[:3])
+            cor_nova = tuple(estado["cor_atual"][:3])
+            desenhar_retangulo(
+                canvas,
+                estado["ponto_inicial"],
+                estado["ponto_final"],
+                estado["cor_atual"], 
+                estado["espessura"]
+            )
+            if cor_original != cor_nova:
+                visitado = vizinhos_8conectado(canvas, ponto, cor_original)
+                pinta_8conectado(canvas, visitado, cor_nova)
+
+        elif estado["ferramenta"] == "circulo":
+             desenhar_circulo(
+                 canvas,
+                 estado["ponto_inicial"][0],
+                 estado["ponto_inicial"][1],
+                 max(abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]), abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])),
+                 estado["cor_atual"], 
+                 estado["espessura"]
+             )
 
         # Limpa os pontos depois de finalizar o desenho
         estado["ponto_inicial"] = None
@@ -279,16 +301,3 @@ def atualizar_cursor(ferramenta, cursores, posicao_mouse=None):
         pygame.mouse.set_cursor(cursores[ferramenta])
     else:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-
-
-def tratar_teclado(_evento, _estado, _canvas):
-    """
-    Placeholder para futuros atalhos e eventos de teclado.
-
-    Args:
-        _evento: Evento de teclado recebido pelo pygame.
-        _estado: Estado atual da aplicação.
-        _canvas: Superfície de desenho que poderá ser alterada futuramente.
-    """
-
-    pass
