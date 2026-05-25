@@ -338,10 +338,49 @@ def obter_rect_painel_opcoes():
         88
     )
 
+def obter_botoes_tamanho_fonte():
+    """
+    Retorna os botões de tamanho da fonte alinhados 2 por 2.
+    """
+
+    painel = obter_rect_painel_opcoes()
+
+    valores = [12, 20, 28, 36]
+    botoes = []
+
+    largura_botao = 22
+    altura_botao = 14
+    espacamento_x = 4
+    espacamento_y = 3
+
+    x_inicial = painel.x + 4
+    y_inicial = painel.y + 20
+
+    for indice, valor in enumerate(valores):
+        coluna = indice % 2
+        linha = indice // 2
+
+        rect = pygame.Rect(
+            x_inicial + coluna * (largura_botao + espacamento_x),
+            y_inicial + linha * (altura_botao + espacamento_y),
+            largura_botao,
+            altura_botao
+        )
+
+        botoes.append({
+            "rect": rect,
+            "valor": valor
+        })
+
+    return botoes
+
 
 def desenhar_painel_opcoes_ferramenta(tela, estado):
     """
-    Desenha um pequeno painel decorativo abaixo dos botões, parecido com o Paint clássico.
+    Desenha o painel de opções da ferramenta atual.
+    Para texto, mostra tamanho da fonte.
+    Para as demais ferramentas, mostra espessura.
+    Para formas, mostra também preenchimento.
     """
 
     painel = obter_rect_painel_opcoes()
@@ -350,11 +389,42 @@ def desenhar_painel_opcoes_ferramenta(tela, estado):
 
     fonte = pygame.font.SysFont(None, 15)
 
-    # Texto Espessura
+    # ==========================================================
+    # Ferramenta Texto: mostra tamanho da fonte
+    # ==========================================================
+    if estado["ferramenta"] == "texto":
+        texto_fonte = fonte.render("Fonte", True, config.COR_TEXTO)
+        tela.blit(texto_fonte, (painel.x + 0, painel.y + 5))
+
+        botoes_fonte = obter_botoes_tamanho_fonte()
+
+        for botao in botoes_fonte:
+            rect = botao["rect"]
+            valor = botao["valor"]
+
+            if estado["texto_tamanho"] == valor:
+                cor = config.COR_BOTAO_PRESSIONADO
+            else:
+                cor = config.COR_BOTAO
+
+            pygame.draw.rect(tela, cor, rect)
+            pygame.draw.rect(tela, config.COR_BORDA, rect, 1)
+
+            texto_valor = fonte.render(str(valor), True, config.COR_TEXTO)
+
+            texto_x = rect.centerx - texto_valor.get_width() // 2
+            texto_y = rect.centery - texto_valor.get_height() // 2
+
+            tela.blit(texto_valor, (texto_x, texto_y))
+
+        return
+
+    # ==========================================================
+    # Demais ferramentas: mostra espessura
+    # ==========================================================
     texto_espessura = fonte.render("Espessura", True, config.COR_TEXTO)
     tela.blit(texto_espessura, (painel.x + 0, painel.y + 5))
 
-    # Botões de espessura
     botoes_espessura = obter_botoes_espessura()
 
     for botao in botoes_espessura:
@@ -376,7 +446,9 @@ def desenhar_painel_opcoes_ferramenta(tela, estado):
 
         tela.blit(texto_valor, (texto_x, texto_y))
 
-    # Botões de preenchimento aparecem somente para formas
+    # ==========================================================
+    # Retângulo e círculo: mostra opção de preenchimento
+    # ==========================================================
     if estado["ferramenta"] in ["retangulo", "circulo"]:
 
         texto_forma = fonte.render("Forma", True, config.COR_TEXTO)

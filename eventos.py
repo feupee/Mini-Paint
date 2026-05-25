@@ -77,7 +77,6 @@ def tratar_mouse_down(evento, estado, canvas):
         # Se clicou em algum botão de ferramenta
         if ferramenta_clicada is not None:
             estado["ferramenta"] = ferramenta_clicada
-
             estado["mouse_pressionado"] = False
             estado["ponto_inicial"] = None
             estado["ponto_final"] = None
@@ -111,6 +110,19 @@ def tratar_mouse_down(evento, estado, canvas):
         ponto_canvas = converter_posicao_para_canvas(evento.pos)
 
         if not ponto_dentro_canvas(canvas, ponto_canvas):
+            return
+
+        # Ferramenta de texto não desenha imediatamente.
+        # Ela apenas guarda a posição onde o texto será escrito.
+        if estado["ferramenta"] == "texto":
+            estado["texto_digitando"] = True
+            estado["texto_posicao"] = ponto_canvas
+            estado["texto_atual"] = ""
+
+            estado["mouse_pressionado"] = False
+            estado["ponto_inicial"] = None
+            estado["ponto_final"] = None
+
             return
 
         # Inicia o desenho no canvas
@@ -163,7 +175,7 @@ def tratar_mouse_motion(evento, estado, canvas):
 
         # Escopo para ferramentas que desenham durante o movimento
         if estado["ferramenta"] == "lapis":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_atual"])
+            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_atual"], estado["espessura"])
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "borracha":
@@ -301,3 +313,89 @@ def atualizar_cursor(ferramenta, cursores, posicao_mouse=None):
         pygame.mouse.set_cursor(cursores[ferramenta])
     else:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
+def cancelar_texto(estado):
+    """
+    Cancela a digitação atual da ferramenta de texto.
+    """
+
+    estado["texto_digitando"] = False
+    estado["texto_posicao"] = None
+    estado["texto_atual"] = ""
+
+
+def confirmar_texto(estado, canvas):
+    """
+    Confirma o texto digitado e desenha definitivamente no canvas.
+    """
+
+    if estado["texto_atual"] == "":
+        cancelar_texto(estado)
+        return
+
+    fonte = pygame.font.SysFont(None, estado["texto_tamanho"])
+
+    superficie_texto = fonte.render(
+        estado["texto_atual"],
+        True,
+        estado["cor_atual"]
+    )
+
+    canvas.blit(superficie_texto, estado["texto_posicao"])
+
+    cancelar_texto(estado)
+
+
+def tratar_key_down_texto(evento, estado, canvas):
+    """
+    Trata a digitação da ferramenta de texto.
+    Enter confirma, Esc cancela e Backspace apaga.
+    """
+
+    if not estado["texto_digitando"]:
+        return
+
+    if evento.key == pygame.K_RETURN:
+        confirmar_texto(estado, canvas)
+
+    elif evento.key == pygame.K_ESCAPE:
+        cancelar_texto(estado)
+
+    elif evento.key == pygame.K_BACKSPACE:
+        estado["texto_atual"] = estado["texto_atual"][:-1]
+
+    else:
+        # evento.unicode contém o caractere digitado.
+        # Algumas teclas, como Shift e Ctrl, têm unicode vazio.
+        if evento.unicode != "":
+            estado["texto_atual"] += evento.unicode
+
+
+def desenhar_previa_texto(canvas, estado):
+    """
+    Desenha uma prévia temporária do texto enquanto o usuário digita.
+    Essa função deve ser usada em uma cópia do canvas, não no canvas original.
+    """
+
+    if not estado["texto_digitando"]:
+        return
+
+    if estado["texto_posicao"] is None:
+        return
+
+    fonte = pygame.font.SysFont(None, estado["texto_tamanho"])
+
+    texto = estado["texto_atual"]
+
+    if texto == "":
+        texto = "|"
+    else:
+        texto += "|"
+
+    superficie_texto = fonte.render(
+        texto,
+        True,
+        estado["cor_atual"]
+    )
+
+    canvas.blit(superficie_texto, estado["texto_posicao"])
