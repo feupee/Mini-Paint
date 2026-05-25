@@ -192,3 +192,28 @@ def plotar_ponto_seguro(canvas, x, y, cor):
         canvas.set_at((x, y), cor)
 
 
+def desenhar_retangulo_preenchido(canvas, p1, p2, cor, espessura):
+    """
+    Desenha um retângulo preenchido pintando todos os pixels
+    entre o ponto inicial e o ponto final.
+
+    Depois desenha a borda usando a função desenhar_retangulo.
+    """
+
+    x1, y1 = p1
+    x2, y2 = p2
+
+    # Garante que funciona independentemente da direção do arrasto do mouse
+    inicio_x = min(x1, x2)
+    fim_x = max(x1, x2)
+    inicio_y = min(y1, y2)
+    fim_y = max(y1, y2)
+
+
+    # Pinta todos os pixels dentro da área do retângulo
+    for y in range(inicio_y, fim_y + 1):
+        for x in range(inicio_x, fim_x + 1):
+
+            # Verifica se o pixel está dentro dos limites do canvas
+            if 0 <= x < canvas.get_width() and 0 <= y < canvas.get_height():
+                canvas.set_at((x, y), cor)
