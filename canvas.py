@@ -128,3 +128,13 @@ def renderizar_canvas(tela, canvas, estado=None):
 
     # Copia o conteúdo do canvas para a tela na posição reservada para desenho
     tela.blit(canvas_para_renderizar, (config.CANVAS_X, config.CANVAS_Y))
+
+def limpar_estado_desenho(estado):
+    """
+    Limpa estados temporários de desenho para impedir que cliques no painel
+    sejam interpretados como desenho no canvas.
+    """
+
+    estado["mouse_pressionado"] = False
+    estado["ponto_inicial"] = None
+    estado["ponto_final"] = None

@@ -1,7 +1,7 @@
 import pygame
 
 from config import LARGURA, ALTURA, CANVAS_LARGURA, CANVAS_ALTURA, COR_FUNDO, COR_DESENHO, FERRAMENTA_PADRAO
-from canvas import criar_canvas, renderizar_canvas
+from canvas import criar_canvas, renderizar_canvas, limpar_estado_desenho
 from eventos import tratar_mouse_down, tratar_mouse_motion, tratar_mouse_up, carregar_cursores, atualizar_cursor
 from botao import (
     desenhar_interface_classica,
@@ -57,18 +57,6 @@ estado = {
     "espessura": 1,
     "preenchido": False
 }
-
-
-def limpar_estado_desenho(estado):
-    """
-    Limpa estados temporários de desenho para impedir que cliques no painel
-    sejam interpretados como desenho no canvas.
-    """
-
-    estado["mouse_pressionado"] = False
-    estado["ponto_inicial"] = None
-    estado["ponto_final"] = None
-
 
 def tratar_clique_espessura(posicao_mouse, estado):
     """

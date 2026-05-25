@@ -127,7 +127,7 @@ FERRAMENTAS = [
         "rotulo": "Texto",
         "imagem": "img/texto.png",
         "cursor": "img/cursor/texto.png",
-        "hotspot": (21, 21)
+        "hotspot": (8, 8)
     }
 ]
 
