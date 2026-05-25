@@ -212,34 +212,42 @@ def mouse_sobre_interface(posicao_mouse):
 def desenhar_menu(tela):
     """
     Desenha a barra de menu superior: File, Edit, View, Image, Colors e Help.
+
+    A barra de menu fica abaixo da barra de título personalizada da janela.
+    Por isso, ela não começa em y = 0.
     """
+
+    y_menu = config.BARRA_TITULO_ALTURA
 
     pygame.draw.rect(
         tela,
         config.COR_JANELA,
-        (0, 0, config.LARGURA, config.MENU_ALTURA)
+        (0, y_menu, config.LARGURA, config.MENU_ALTURA)
     )
 
     pygame.draw.line(
         tela,
         config.COR_BOTAO_BORDA_CLARA,
-        (0, 0),
-        (config.LARGURA, 0)
+        (0, y_menu),
+        (config.LARGURA, y_menu)
     )
+
     pygame.draw.line(
         tela,
         config.COR_CINZA_MEDIO,
-        (0, config.MENU_ALTURA - 1),
-        (config.LARGURA, config.MENU_ALTURA - 1)
+        (0, y_menu + config.MENU_ALTURA - 1),
+        (config.LARGURA, y_menu + config.MENU_ALTURA - 1)
     )
 
     fonte_menu = fonte_classica(18)
 
     x_menu = 8
+    y_texto = y_menu + 5
+
     for menu in config.MENU_OPCOES:
         texto_menu = fonte_menu.render(menu, True, config.COR_PRETO)
-        tela.blit(texto_menu, (x_menu, 5))
-        x_menu += texto_menu.get_width() + 18
+        tela.blit(texto_menu, (x_menu, y_texto))
+        x_menu += texto_menu.get_width() + 7
 
 def desenhar_area_ferramentas(tela):
     """
@@ -329,13 +337,28 @@ def desenhar_botoes_ferramentas(tela, estado):
 def obter_rect_painel_opcoes():
     """
     Retorna o retângulo do painel de opções da ferramenta.
+
+    O painel fica abaixo da grade de ferramentas.
+    A posição vertical é calculada com base na quantidade de ferramentas,
+    evitando que o painel fique sobreposto aos botões ou ao canvas.
     """
 
+    quantidade_ferramentas = len(config.FERRAMENTAS)
+    linhas_ferramentas = (quantidade_ferramentas + config.BOTAO_COLUNAS - 1) // config.BOTAO_COLUNAS
+
+    painel_x = config.BOTAO_X_INICIAL
+    painel_y = config.BOTAO_Y + linhas_ferramentas * (
+        config.BOTAO_ALTURA + config.BOTAO_ESPACAMENTO
+    ) + 4
+
+    painel_largura = config.BARRA_FERRAMENTAS_LARGURA - 8
+    painel_altura = 88
+
     return pygame.Rect(
-        config.BOTAO_X_INICIAL,
-        config.BOTAO_Y + 4 * (config.BOTAO_ALTURA + config.BOTAO_ESPACAMENTO),
-        config.BARRA_FERRAMENTAS_LARGURA - 8,
-        88
+        painel_x,
+        painel_y,
+        painel_largura,
+        painel_altura
     )
 
 def obter_botoes_tamanho_fonte():
@@ -382,6 +405,10 @@ def desenhar_painel_opcoes_ferramenta(tela, estado):
     Para as demais ferramentas, mostra espessura.
     Para formas, mostra também preenchimento.
     """
+
+    if estado["ferramenta"] == "conta-gotas":
+        # Conta-gotas não tem opções, então só desenha o painel vazio
+        return
 
     painel = obter_rect_painel_opcoes()
 
@@ -476,10 +503,10 @@ def desenhar_moldura_canvas(tela):
     """
 
     moldura = pygame.Rect(
-        config.CANVAS_X - 2,
-        config.CANVAS_Y - 2,
-        config.CANVAS_LARGURA + 4,
-        config.CANVAS_ALTURA + 4
+        config.CANVAS_X ,
+        config.CANVAS_Y ,
+        config.CANVAS_LARGURA ,
+        config.CANVAS_ALTURA 
     )
 
     desenhar_borda_rebaixada(tela, moldura)

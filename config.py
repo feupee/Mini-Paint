@@ -32,13 +32,21 @@ COR_CINZA_ESCURO = (64, 64, 64)
 COR_AZUL_SELECAO = (0, 0, 128)
 
 # Barra de menu superior
-MENU_ALTURA = 24
+BARRA_TITULO_ALTURA = 28
+MENU_ALTURA = 26
 MENU_OPCOES = ["File", "Edit", "View", "Image", "Colors", "Help"]
 
-# Barra lateral de ferramentas
-BARRA_FERRAMENTAS_X = 4
-BARRA_FERRAMENTAS_Y = MENU_ALTURA + 4
-BARRA_FERRAMENTAS_LARGURA = 58
+# Espaçamentos gerais do layout.
+MARGEM_EXTERNA = 4
+MARGEM_ENTRE_AREAS = 3
+CONTEUDO_Y = BARRA_TITULO_ALTURA + MENU_ALTURA + MARGEM_ENTRE_AREAS - 5
+
+# Barra lateral de ferramentas.
+# A largura foi aumentada para permitir que o painel de opções mostre
+# espessura, tamanho de fonte e preenchimento sem invadir o canvas.
+BARRA_FERRAMENTAS_X = MARGEM_EXTERNA
+BARRA_FERRAMENTAS_Y = CONTEUDO_Y
+BARRA_FERRAMENTAS_LARGURA = 72
 
 # Barras falsas de rolagem, apenas visuais
 SCROLLBAR_TAMANHO = 16
@@ -52,12 +60,10 @@ PALETA_ALTURA = 55
 COR_TAMANHO = 20
 COR_ESPACAMENTO = 4
 
-# Área do canvas dentro da janela
-# CANVAS_LARGURA e CANVAS_ALTURA são fixos: 800x600.
-# A janela é calculada em volta do canvas para acomodar ferramentas,
-# paleta, barra de status e barras falsas de rolagem.
-CANVAS_X = BARRA_FERRAMENTAS_X + BARRA_FERRAMENTAS_LARGURA + 8
-CANVAS_Y = MENU_ALTURA + 8
+# Área do canvas dentro da janela.
+# O tamanho do canvas continua fixo em 800x600; apenas a posição muda.
+CANVAS_X = BARRA_FERRAMENTAS_X + BARRA_FERRAMENTAS_LARGURA + MARGEM_ENTRE_AREAS
+CANVAS_Y = CONTEUDO_Y
 
 # Largura da janela do programa
 LARGURA = CANVAS_X + CANVAS_LARGURA + SCROLLBAR_TAMANHO + 12
@@ -138,10 +144,13 @@ ICONE = [
     }
 ]
 
+#Menu
+BARRA_TITULO_ALTURA = 23
+MENU_ALTURA = 26
 
 # Configurações visuais dos botões
-BOTAO_X_INICIAL = BARRA_FERRAMENTAS_X + 4
-BOTAO_Y = BARRA_FERRAMENTAS_Y + 4
+BOTAO_X_INICIAL = BARRA_FERRAMENTAS_X + 7
+BOTAO_Y = BARRA_FERRAMENTAS_Y + 6
 BOTAO_LARGURA = 25
 BOTAO_ALTURA = 25
 BOTAO_ESPACAMENTO = 4
