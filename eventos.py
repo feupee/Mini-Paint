@@ -1,7 +1,7 @@
 import pygame
 import config
 
-from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado, desenhar_circulo, desenhar_retangulo
+from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido
 from botao import obter_ferramenta_clicada, obter_cor_clicada, mouse_sobre_algum_botao, mouse_sobre_interface
 
 
@@ -244,19 +244,13 @@ def tratar_mouse_up(evento, estado, canvas):
             )
 
         elif estado["ferramenta"] == "retangulo" and estado["preenchido"] is True:
-            ponto = ponto_canvas
-            cor_original = tuple(canvas.get_at(ponto)[:3])
-            cor_nova = tuple(estado["cor_atual"][:3])
-            desenhar_retangulo(
+            desenhar_retangulo_preenchido(
                 canvas,
                 estado["ponto_inicial"],
                 estado["ponto_final"],
-                estado["cor_atual"], 
-                estado["espessura"]
+                estado["cor_atual"],
+                espessura=1
             )
-            if cor_original != cor_nova:
-                visitado = vizinhos_8conectado(canvas, ponto, cor_original)
-                pinta_8conectado(canvas, visitado, cor_nova)
 
         elif estado["ferramenta"] == "circulo":
              desenhar_circulo(

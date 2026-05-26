@@ -1,6 +1,6 @@
 import pygame
 import config
-from algoritmos import desenhar_linha_dda, desenhar_circulo, desenhar_retangulo, vizinhos_8conectado, pinta_8conectado
+from algoritmos import desenhar_linha_dda, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido
 
 
 def criar_canvas(largura, altura, cor_fundo):
@@ -92,19 +92,13 @@ def criar_canvas_preview(canvas, estado):
         estado["preenchido"] is True
     ):
         canvas_preview = canvas.copy()
-        ponto = estado["ponto_inicial"]
-        cor_original = tuple(canvas_preview.get_at(ponto)[:3])
-        cor_nova = tuple(estado["cor_atual"][:3])
-        desenhar_retangulo(
+        desenhar_retangulo_preenchido(
             canvas_preview,
             estado["ponto_inicial"],
             estado["ponto_final"],
             estado["cor_atual"], 
-            estado["espessura"]
+            espessura=1
         )
-        if cor_original != cor_nova:
-            visitado = vizinhos_8conectado(canvas_preview, ponto, cor_original)
-            pinta_8conectado(canvas_preview, visitado, cor_nova)
         return canvas_preview
 
     return canvas
