@@ -209,7 +209,7 @@ def mouse_sobre_interface(posicao_mouse):
     return not dentro_canvas
 
 
-def desenhar_menu(tela):
+def desenhar_menu(tela, menu_pressionado=None):
     """
     Desenha a barra de menu superior: File, Edit, View, Image, Colors e Help.
 
@@ -241,13 +241,34 @@ def desenhar_menu(tela):
 
     fonte_menu = fonte_classica(18)
 
-    x_menu = 8
-    y_texto = y_menu + 5
+    posicao_mouse = pygame.mouse.get_pos()
+    rects_menu = obter_rects_menu()
+
+    x_texto = 7
 
     for menu in config.MENU_OPCOES:
+        rect_menu = rects_menu[menu]
+
+        mouse_em_cima = rect_menu.collidepoint(posicao_mouse)
+        pressionado = menu_pressionado == menu and mouse_em_cima
+
+        if mouse_em_cima or pressionado:
+            pygame.draw.rect(tela, config.COR_JANELA, rect_menu)
+            desenhar_borda_3d(tela, rect_menu, pressionado=pressionado)
+
+        deslocamento = 1 if pressionado else 0
+
         texto_menu = fonte_menu.render(menu, True, config.COR_PRETO)
-        tela.blit(texto_menu, (x_menu, y_texto))
-        x_menu += texto_menu.get_width() + 7
+
+        tela.blit(
+            texto_menu,
+            (
+                x_texto + deslocamento,
+                y_menu + 6 + deslocamento
+            )
+        )
+
+        x_texto += texto_menu.get_width() + 7
 
 def desenhar_area_ferramentas(tela):
     """
@@ -334,6 +355,43 @@ def desenhar_botoes_ferramentas(tela, estado):
 
             tela.blit(texto, texto_rect)
 
+def obter_rects_menu():
+    """
+    Retorna os retângulos clicáveis das opções do menu superior.
+    """
+
+    y_menu = config.BARRA_TITULO_ALTURA
+    fonte_menu = fonte_classica(18)
+
+    rects_menu = {}
+    x_menu = 8
+
+    for menu in config.MENU_OPCOES:
+        largura_texto, _ = fonte_menu.size(menu)
+
+        rects_menu[menu] = pygame.Rect(
+    x_menu - 8,
+    y_menu + 2,
+    largura_texto + 11,
+    config.MENU_ALTURA - 4
+)
+
+        x_menu += largura_texto + 7
+
+    return rects_menu
+
+def obter_opcao_menu_clicada(posicao_mouse):
+    """
+    Verifica se o usuário clicou em alguma opção do menu superior.
+    """
+
+    for menu, rect in obter_rects_menu().items():
+        if rect.collidepoint(posicao_mouse):
+            return menu
+
+    return None
+
+
 def obter_rect_painel_opcoes():
     """
     Retorna o retângulo do painel de opções da ferramenta.
@@ -408,6 +466,10 @@ def desenhar_painel_opcoes_ferramenta(tela, estado):
 
     if estado["ferramenta"] == "conta-gotas":
         # Conta-gotas não tem opções, então só desenha o painel vazio
+        return
+    
+    if estado["ferramenta"] == "preenchimento":
+        # Balde não tem opções, então só desenha o painel vazio
         return
 
     painel = obter_rect_painel_opcoes()
@@ -888,7 +950,7 @@ def desenhar_interface_classica(tela, estado):
     Desenha todos os elementos visuais que simulam o Paint clássico.
     """
 
-    desenhar_menu(tela)
+    desenhar_menu(tela, estado.get("menu_pressionado"))
     desenhar_area_ferramentas(tela)
     desenhar_botoes_ferramentas(tela, estado)
     desenhar_painel_opcoes_ferramenta(tela, estado)

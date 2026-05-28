@@ -1,6 +1,8 @@
 import pygame
 import config
 from algoritmos import desenhar_linha_dda, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido
+import os
+from datetime import datetime
 
 
 def criar_canvas(largura, altura, cor_fundo):
@@ -132,3 +134,15 @@ def limpar_estado_desenho(estado):
     estado["mouse_pressionado"] = False
     estado["ponto_inicial"] = None
     estado["ponto_final"] = None
+
+def novo_arquivo(canvas, estado=None):
+    canvas.fill(config.COR_FUNDO)
+
+def salvar_canvas_png(canvas):
+    os.makedirs("exports", exist_ok=True)
+    nome_arquivo = datetime.now().strftime("desenho_%Y%m%d_%H%M%S.png")
+    caminho = os.path.join("exports", nome_arquivo)
+
+    pygame.image.save(canvas, caminho)
+
+    return caminho

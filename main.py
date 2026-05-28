@@ -1,7 +1,7 @@
 import pygame
 
 from config import LARGURA, ALTURA, CANVAS_LARGURA, CANVAS_ALTURA, COR_FUNDO, COR_DESENHO, FERRAMENTA_PADRAO
-from canvas import criar_canvas, renderizar_canvas, limpar_estado_desenho
+from canvas import criar_canvas, renderizar_canvas, limpar_estado_desenho, novo_arquivo, salvar_canvas_png
 from eventos import (
     tratar_mouse_down,
     tratar_mouse_motion,
@@ -17,6 +17,7 @@ from botao import (
     obter_rect_botao_minimizar,
     obter_rect_botao_maximizar,
     obter_rect_botao_fechar,
+    obter_opcao_menu_clicada,
     obter_botoes_espessura,
     obter_botoes_preenchido,
     obter_botoes_tamanho_fonte
@@ -62,6 +63,7 @@ estado = {
     "ponto_final": None,
     "arrastando_janela": False,
     "botao_janela_pressionado": None,
+    "menu_pressionado": None,
     "clicando_painel_opcoes": False,
     "espessura": 1,
     "preenchido": False,
@@ -160,6 +162,8 @@ while estado["rodando"]:
                 rect_maximizar = obter_rect_botao_maximizar(tela)
                 rect_barra = obter_rect_barra_janela(tela)
 
+                opcao_menu = obter_opcao_menu_clicada(evento.pos)
+
                 if rect_fechar.collidepoint(evento.pos):
                     estado["botao_janela_pressionado"] = "fechar"
 
@@ -169,6 +173,10 @@ while estado["rodando"]:
                 elif rect_maximizar.collidepoint(evento.pos):
                     # Botão maximizar existe visualmente, mas não faz nada.
                     estado["botao_janela_pressionado"] = None
+
+                elif opcao_menu is not None:
+                    estado["menu_pressionado"] = opcao_menu
+                    limpar_estado_desenho(estado)
 
                 elif rect_barra.collidepoint(evento.pos):
                     estado["arrastando_janela"] = True
@@ -217,6 +225,20 @@ while estado["rodando"]:
                 elif estado["arrastando_janela"]:
                     estado["arrastando_janela"] = False
 
+                elif estado["menu_pressionado"] is not None:
+                    opcao_menu = obter_opcao_menu_clicada(evento.pos)
+
+                    if opcao_menu == estado["menu_pressionado"]:
+
+                        if opcao_menu.lower() == "new file":
+                            novo_arquivo(canvas, estado)
+
+                        elif opcao_menu.lower() == "save":
+                            caminho_salvo = salvar_canvas_png(canvas)
+                            print(f"Canvas salvo em: {caminho_salvo}")
+
+                    estado["menu_pressionado"] = None
+
                 elif estado["clicando_painel_opcoes"]:
                     estado["clicando_painel_opcoes"] = False
                     limpar_estado_desenho(estado)
@@ -225,6 +247,7 @@ while estado["rodando"]:
                     tratar_mouse_up(evento, estado, canvas)
 
                 estado["botao_janela_pressionado"] = None
+                estado["menu_pressionado"] = None
                 estado["arrastando_janela"] = False
                 estado["clicando_painel_opcoes"] = False
 
