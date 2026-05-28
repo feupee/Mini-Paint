@@ -144,6 +144,10 @@ ICONE = [
     }
 ]
 
+#Menu
+BARRA_TITULO_ALTURA = 23
+MENU_ALTURA = 26
+
 # Configurações visuais dos botões
 BOTAO_X_INICIAL = BARRA_FERRAMENTAS_X + 7
 BOTAO_Y = BARRA_FERRAMENTAS_Y + 6

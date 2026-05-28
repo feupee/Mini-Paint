@@ -1,7 +1,22 @@
 import pygame
 
-from config import LARGURA, ALTURA, CANVAS_LARGURA, CANVAS_ALTURA, COR_FUNDO, COR_DESENHO, FERRAMENTA_PADRAO
-from canvas import criar_canvas, renderizar_canvas, limpar_estado_desenho, novo_arquivo, salvar_canvas_png
+from config import (
+    LARGURA,
+    ALTURA,
+    CANVAS_LARGURA,
+    CANVAS_ALTURA,
+    COR_FUNDO,
+    COR_DESENHO,
+    FERRAMENTA_PADRAO
+)
+from canvas import (
+    criar_canvas,
+    criar_canvas_visual,
+    renderizar_canvas,
+    limpar_estado_desenho,
+    novo_arquivo,
+    salvar_canvas_png
+)
 from eventos import (
     tratar_mouse_down,
     tratar_mouse_motion,
@@ -34,6 +49,8 @@ pygame.init()
 tela = pygame.display.set_mode((LARGURA, ALTURA), pygame.NOFRAME)
 pygame.display.set_caption("untitled - Paint")
 
+clock = pygame.time.Clock()
+
 # Carregar os cursores do paint
 cursores = carregar_cursores()
 
@@ -51,7 +68,11 @@ try:
 except:
     pass
 
+# Matriz lógica do desenho. Os algoritmos escrevem nela usando put_pixel.
 canvas = criar_canvas(CANVAS_LARGURA, CANVAS_ALTURA, COR_FUNDO)
+
+# Surface visual usada para exibição rápida, pré-visualização e exportação.
+canvas_visual = criar_canvas_visual(CANVAS_LARGURA, CANVAS_ALTURA, COR_FUNDO)
 
 estado = {
     "rodando": True,
@@ -185,12 +206,12 @@ while estado["rodando"]:
                     clicou_no_painel = tratar_clique_painel_opcoes(evento.pos, estado)
 
                     if not clicou_no_painel:
-                        tratar_mouse_down(evento, estado, canvas)
+                        tratar_mouse_down(evento, estado, canvas, canvas_visual)
 
                     atualizar_cursor(estado["ferramenta"], cursores, evento.pos)
 
             else:
-                tratar_mouse_down(evento, estado, canvas)
+                tratar_mouse_down(evento, estado, canvas, canvas_visual)
                 atualizar_cursor(estado["ferramenta"], cursores, evento.pos)
 
         elif evento.type == pygame.MOUSEMOTION:
@@ -205,7 +226,7 @@ while estado["rodando"]:
                 atualizar_cursor(estado["ferramenta"], cursores, evento.pos)
 
             else:
-                tratar_mouse_motion(evento, estado, canvas)
+                tratar_mouse_motion(evento, estado, canvas, canvas_visual)
                 atualizar_cursor(estado["ferramenta"], cursores, evento.pos)
 
         elif evento.type == pygame.MOUSEBUTTONUP:
@@ -231,10 +252,10 @@ while estado["rodando"]:
                     if opcao_menu == estado["menu_pressionado"]:
 
                         if opcao_menu.lower() == "new file":
-                            novo_arquivo(canvas, estado)
+                            novo_arquivo(canvas, canvas_visual, estado)
 
                         elif opcao_menu.lower() == "save":
-                            caminho_salvo = salvar_canvas_png(canvas)
+                            caminho_salvo = salvar_canvas_png(canvas_visual)
                             print(f"Canvas salvo em: {caminho_salvo}")
 
                     estado["menu_pressionado"] = None
@@ -244,7 +265,7 @@ while estado["rodando"]:
                     limpar_estado_desenho(estado)
 
                 else:
-                    tratar_mouse_up(evento, estado, canvas)
+                    tratar_mouse_up(evento, estado, canvas, canvas_visual)
 
                 estado["botao_janela_pressionado"] = None
                 estado["menu_pressionado"] = None
@@ -252,22 +273,23 @@ while estado["rodando"]:
                 estado["clicando_painel_opcoes"] = False
 
             else:
-                tratar_mouse_up(evento, estado, canvas)
+                tratar_mouse_up(evento, estado, canvas, canvas_visual)
 
         elif evento.type == pygame.KEYDOWN:
             if estado["texto_digitando"]:
-                tratar_key_down_texto(evento, estado, canvas)
+                tratar_key_down_texto(evento, estado, canvas, canvas_visual)
 
     if estado["texto_digitando"]:
-        canvas_exibicao = canvas.copy()
+        canvas_exibicao = canvas_visual.copy()
         desenhar_previa_texto(canvas_exibicao, estado)
     else:
-        canvas_exibicao = canvas
+        canvas_exibicao = canvas_visual
 
     renderizar_canvas(tela, canvas_exibicao, estado)
 
     desenhar_interface_classica(tela, estado)
 
     pygame.display.update()
+    clock.tick(60)
 
 pygame.quit()

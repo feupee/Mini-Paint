@@ -1,8 +1,23 @@
 import pygame
 import config
 
-from algoritmos import desenhar_linha_dda, balde_de_tinta, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido, desenhar_circulo_preenchido
-from botao import obter_ferramenta_clicada, obter_cor_clicada, mouse_sobre_algum_botao, mouse_sobre_interface
+from algoritmos import (
+    desenhar_linha_dda,
+    vizinhos_8conectado,
+    pinta_8conectado,
+    desenhar_circulo,
+    desenhar_circulo_preenchido,
+    desenhar_retangulo,
+    desenhar_retangulo_preenchido,
+    get_pixel
+)
+from botao import (
+    obter_ferramenta_clicada,
+    obter_cor_clicada,
+    mouse_sobre_algum_botao,
+    mouse_sobre_interface
+)
+from canvas import desenhar_surface_na_matriz
 
 
 
@@ -38,6 +53,17 @@ def converter_posicao_para_canvas(posicao_mouse):
     return (x - config.CANVAS_X, y - config.CANVAS_Y)
 
 
+def obter_largura_canvas(canvas):
+    if len(canvas) == 0:
+        return 0
+
+    return len(canvas[0])
+
+
+def obter_altura_canvas(canvas):
+    return len(canvas)
+
+
 def ponto_dentro_canvas(canvas, ponto):
     """
     Verifica se o ponto está dentro dos limites do canvas.
@@ -45,7 +71,7 @@ def ponto_dentro_canvas(canvas, ponto):
     """
 
     x, y = ponto
-    return 0 <= x < canvas.get_width() and 0 <= y < canvas.get_height()
+    return 0 <= x < obter_largura_canvas(canvas) and 0 <= y < obter_altura_canvas(canvas)
 
 
 def ponto_janela_dentro_canvas(posicao_mouse):
@@ -61,7 +87,7 @@ def ponto_janela_dentro_canvas(posicao_mouse):
     )
 
 
-def tratar_mouse_down(evento, estado, canvas):
+def tratar_mouse_down(evento, estado, canvas, canvas_visual):
     """
     Trata o clique do mouse.
 
@@ -132,29 +158,60 @@ def tratar_mouse_down(evento, estado, canvas):
 
         # Escopo para ferramentas que desenham ao clicar
         if estado["ferramenta"] == "lapis":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_atual"], estado["espessura"])
+            desenhar_linha_dda(
+                canvas,
+                estado["ponto_inicial"],
+                ponto_canvas,
+                estado["cor_atual"],
+                estado["espessura"],
+                canvas_visual
+            )
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "borracha":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_fundo"], estado["espessura"])
+            desenhar_linha_dda(
+                canvas,
+                estado["ponto_inicial"],
+                ponto_canvas,
+                estado["cor_fundo"],
+                estado["espessura"],
+                canvas_visual
+            )
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "preenchimento":
-            cor_original = tuple(canvas.get_at(ponto_canvas)[:3])
+            ponto = ponto_canvas
+            cor_original = get_pixel(canvas, ponto[0], ponto[1])
             cor_nova = tuple(estado["cor_atual"][:3])
-            balde_de_tinta(canvas, ponto_canvas, cor_original, cor_nova)
+
+            if cor_original != cor_nova:
+                visitado = vizinhos_8conectado(canvas, ponto, cor_original)
+                pinta_8conectado(canvas, visitado, cor_nova, canvas_visual)
+
+            estado["mouse_pressionado"] = False
+            estado["ponto_inicial"] = None
+            estado["ponto_final"] = None
 
         elif estado["ferramenta"] == "conta-gotas":
-            cor_clicada = canvas.get_at(ponto_canvas)
-            estado["cor_atual"] = cor_clicada
+            cor_clicada = get_pixel(canvas, ponto_canvas[0], ponto_canvas[1])
+
+            if cor_clicada is not None:
+                estado["cor_atual"] = cor_clicada
+
+            estado["mouse_pressionado"] = False
+            estado["ponto_inicial"] = None
+            estado["ponto_final"] = None
 
 
-def tratar_mouse_motion(evento, estado, canvas):
+def tratar_mouse_motion(evento, estado, canvas, canvas_visual):
     """
     Trata o movimento do mouse.
 
-    Essa função pode ser usada para ferramentas que desenham
-    enquanto o mouse está pressionado, como lápis ou borracha.
+    Essa função pode ser usada para ferramentas que desenham enquanto o mouse
+    está pressionado, como lápis ou borracha.
+
+    Para linha, retângulo e círculo, aqui só atualizamos o ponto final. A prévia
+    em tempo real é desenhada pelo Pygame em uma cópia da Surface visual.
     """
 
     if estado["mouse_pressionado"]:
@@ -172,15 +229,29 @@ def tratar_mouse_motion(evento, estado, canvas):
 
         # Escopo para ferramentas que desenham durante o movimento
         if estado["ferramenta"] == "lapis":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_atual"], estado["espessura"])
+            desenhar_linha_dda(
+                canvas,
+                estado["ponto_inicial"],
+                ponto_canvas,
+                estado["cor_atual"],
+                estado["espessura"],
+                canvas_visual
+            )
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "borracha":
-            desenhar_linha_dda(canvas, estado["ponto_inicial"], ponto_canvas, estado["cor_fundo"], estado["espessura"])
+            desenhar_linha_dda(
+                canvas,
+                estado["ponto_inicial"],
+                ponto_canvas,
+                estado["cor_fundo"],
+                estado["espessura"],
+                canvas_visual
+            )
             estado["ponto_inicial"] = ponto_canvas
 
 
-def tratar_mouse_up(evento, estado, canvas):
+def tratar_mouse_up(evento, estado, canvas, canvas_visual):
     """
     Trata o momento em que o usuário solta o botão do mouse.
     """
@@ -218,17 +289,10 @@ def tratar_mouse_up(evento, estado, canvas):
                 canvas,
                 estado["ponto_inicial"],
                 estado["ponto_final"],
-                estado["cor_atual"], 
-                estado["espessura"]
+                estado["cor_atual"],
+                estado["espessura"],
+                canvas_visual
             )
-
-        # Escopo para futuras ferramentas
-
-        # elif estado["ferramenta"] == "lapis":
-        #     pass
-
-        # elif estado["ferramenta"] == "borracha":
-        #     pass
 
         # Ferramenta retangulo
         elif estado["ferramenta"] == "retangulo" and estado["preenchido"] is False:
@@ -236,8 +300,9 @@ def tratar_mouse_up(evento, estado, canvas):
                 canvas,
                 estado["ponto_inicial"],
                 estado["ponto_final"],
-                estado["cor_atual"], 
-                estado["espessura"]
+                estado["cor_atual"],
+                estado["espessura"],
+                canvas_visual
             )
 
         elif estado["ferramenta"] == "retangulo" and estado["preenchido"] is True:
@@ -246,32 +311,41 @@ def tratar_mouse_up(evento, estado, canvas):
                 estado["ponto_inicial"],
                 estado["ponto_final"],
                 estado["cor_atual"],
-                espessura=1
+                espessura=1,
+                canvas_visual=canvas_visual
             )
 
-        elif estado["ferramenta"] == "circulo" and estado["preenchido"] is False:
-             desenhar_circulo(
-                 canvas,
-                 estado["ponto_inicial"][0],
-                 estado["ponto_inicial"][1],
-                 max(abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]), abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])),
-                 estado["cor_atual"], 
-                 estado["espessura"]
-             )
+        elif estado["ferramenta"] == "circulo":
+            raio = max(
+                abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]),
+                abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])
+            )
 
-        elif estado["ferramenta"] == "circulo" and estado["preenchido"] is True:
-             desenhar_circulo_preenchido(
-                 canvas,
-                 estado["ponto_inicial"][0],
-                 estado["ponto_inicial"][1],
-                 max(abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]), abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])),
-                 estado["cor_atual"], 
-                 estado["espessura"]
-             )
+            if estado["preenchido"] is True:
+                desenhar_circulo_preenchido(
+                    canvas,
+                    estado["ponto_inicial"][0],
+                    estado["ponto_inicial"][1],
+                    raio,
+                    estado["cor_atual"],
+                    estado["espessura"],
+                    canvas_visual
+                )
+            else:
+                desenhar_circulo(
+                    canvas,
+                    estado["ponto_inicial"][0],
+                    estado["ponto_inicial"][1],
+                    raio,
+                    estado["cor_atual"],
+                    estado["espessura"],
+                    canvas_visual
+                )
 
         # Limpa os pontos depois de finalizar o desenho
         estado["ponto_inicial"] = None
         estado["ponto_final"] = None
+
 
 def carregar_cursor_png(caminho, hotspot=(0, 0)):
     """
@@ -282,6 +356,7 @@ def carregar_cursor_png(caminho, hotspot=(0, 0)):
     cursor = pygame.cursors.Cursor(hotspot, imagem)
 
     return cursor
+
 
 def carregar_cursores():
     cursores = {}
@@ -294,6 +369,7 @@ def carregar_cursores():
         )
 
     return cursores
+
 
 def atualizar_cursor(ferramenta, cursores, posicao_mouse=None):
     """
@@ -315,6 +391,7 @@ def atualizar_cursor(ferramenta, cursores, posicao_mouse=None):
     else:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
+
 def cancelar_texto(estado):
     """
     Cancela a digitação atual da ferramenta de texto.
@@ -325,7 +402,7 @@ def cancelar_texto(estado):
     estado["texto_atual"] = ""
 
 
-def confirmar_texto(estado, canvas):
+def confirmar_texto(estado, canvas, canvas_visual):
     """
     Confirma o texto digitado e desenha definitivamente no canvas.
     """
@@ -342,12 +419,17 @@ def confirmar_texto(estado, canvas):
         estado["cor_atual"]
     )
 
-    canvas.blit(superficie_texto, estado["texto_posicao"])
+    desenhar_surface_na_matriz(
+        canvas,
+        canvas_visual,
+        superficie_texto,
+        estado["texto_posicao"]
+    )
 
     cancelar_texto(estado)
 
 
-def tratar_key_down_texto(evento, estado, canvas):
+def tratar_key_down_texto(evento, estado, canvas, canvas_visual):
     """
     Trata a digitação da ferramenta de texto.
     Enter confirma, Esc cancela e Backspace apaga.
@@ -357,7 +439,7 @@ def tratar_key_down_texto(evento, estado, canvas):
         return
 
     if evento.key == pygame.K_RETURN:
-        confirmar_texto(estado, canvas)
+        confirmar_texto(estado, canvas, canvas_visual)
 
     elif evento.key == pygame.K_ESCAPE:
         cancelar_texto(estado)
@@ -372,10 +454,10 @@ def tratar_key_down_texto(evento, estado, canvas):
             estado["texto_atual"] += evento.unicode
 
 
-def desenhar_previa_texto(canvas, estado):
+def desenhar_previa_texto(canvas_visual, estado):
     """
     Desenha uma prévia temporária do texto enquanto o usuário digita.
-    Essa função deve ser usada em uma cópia do canvas, não no canvas original.
+    Essa função deve ser usada em uma cópia da Surface visual, não no canvas original.
     """
 
     if not estado["texto_digitando"]:
@@ -399,4 +481,4 @@ def desenhar_previa_texto(canvas, estado):
         estado["cor_atual"]
     )
 
-    canvas.blit(superficie_texto, estado["texto_posicao"])
+    canvas_visual.blit(superficie_texto, estado["texto_posicao"])
