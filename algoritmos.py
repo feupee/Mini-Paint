@@ -251,7 +251,6 @@ def plotar_ponto_espesso(canvas, x, y, cor, espessura):
         for dy in range(-metade, metade + 1):
             plotar_ponto_seguro(canvas, x + dx, y + dy, cor)
 
-
 def desenhar_retangulo_preenchido(canvas, p1, p2, cor, espessura):
     """
     Desenha um retângulo preenchido pintando todos os pixels
@@ -291,4 +290,3 @@ def desenhar_circulo_preenchido(canvas, cx, cy, raio, cor, espessura):
             if (x - cx) ** 2 + (y - cy) ** 2 <= raio ** 2:
                 if 0 <= x < canvas.get_width() and 0 <= y < canvas.get_height():
                     canvas.set_at((x, y), cor)
-

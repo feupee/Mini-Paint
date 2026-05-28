@@ -209,37 +209,66 @@ def mouse_sobre_interface(posicao_mouse):
     return not dentro_canvas
 
 
-def desenhar_menu(tela):
+def desenhar_menu(tela, menu_pressionado=None):
     """
     Desenha a barra de menu superior: File, Edit, View, Image, Colors e Help.
+
+    A barra de menu fica abaixo da barra de título personalizada da janela.
+    Por isso, ela não começa em y = 0.
     """
+
+    y_menu = config.BARRA_TITULO_ALTURA
 
     pygame.draw.rect(
         tela,
         config.COR_JANELA,
-        (0, 0, config.LARGURA, config.MENU_ALTURA)
+        (0, y_menu, config.LARGURA, config.MENU_ALTURA)
     )
 
     pygame.draw.line(
         tela,
         config.COR_BOTAO_BORDA_CLARA,
-        (0, 0),
-        (config.LARGURA, 0)
+        (0, y_menu),
+        (config.LARGURA, y_menu)
     )
+
     pygame.draw.line(
         tela,
         config.COR_CINZA_MEDIO,
-        (0, config.MENU_ALTURA - 1),
-        (config.LARGURA, config.MENU_ALTURA - 1)
+        (0, y_menu + config.MENU_ALTURA - 1),
+        (config.LARGURA, y_menu + config.MENU_ALTURA - 1)
     )
 
     fonte_menu = fonte_classica(18)
 
-    x_menu = 8
+    posicao_mouse = pygame.mouse.get_pos()
+    rects_menu = obter_rects_menu()
+
+    x_texto = 7
+
     for menu in config.MENU_OPCOES:
+        rect_menu = rects_menu[menu]
+
+        mouse_em_cima = rect_menu.collidepoint(posicao_mouse)
+        pressionado = menu_pressionado == menu and mouse_em_cima
+
+        if mouse_em_cima or pressionado:
+            pygame.draw.rect(tela, config.COR_JANELA, rect_menu)
+            desenhar_borda_3d(tela, rect_menu, pressionado=pressionado)
+
+        deslocamento = 1 if pressionado else 0
+
         texto_menu = fonte_menu.render(menu, True, config.COR_PRETO)
-        tela.blit(texto_menu, (x_menu, 5))
-        x_menu += texto_menu.get_width() + 18
+
+        tela.blit(
+            texto_menu,
+            (
+                x_texto + deslocamento,
+                y_menu + 6 + deslocamento
+            )
+        )
+
+        x_texto += texto_menu.get_width() + 7
 
 def desenhar_area_ferramentas(tela):
     """
@@ -326,23 +355,122 @@ def desenhar_botoes_ferramentas(tela, estado):
 
             tela.blit(texto, texto_rect)
 
+def obter_rects_menu():
+    """
+    Retorna os retângulos clicáveis das opções do menu superior.
+    """
+
+    y_menu = config.BARRA_TITULO_ALTURA
+    fonte_menu = fonte_classica(18)
+
+    rects_menu = {}
+    x_menu = 8
+
+    for menu in config.MENU_OPCOES:
+        largura_texto, _ = fonte_menu.size(menu)
+
+        rects_menu[menu] = pygame.Rect(
+    x_menu - 8,
+    y_menu + 2,
+    largura_texto + 11,
+    config.MENU_ALTURA - 4
+)
+
+        x_menu += largura_texto + 7
+
+    return rects_menu
+
+def obter_opcao_menu_clicada(posicao_mouse):
+    """
+    Verifica se o usuário clicou em alguma opção do menu superior.
+    """
+
+    for menu, rect in obter_rects_menu().items():
+        if rect.collidepoint(posicao_mouse):
+            return menu
+
+    return None
+
+
 def obter_rect_painel_opcoes():
     """
     Retorna o retângulo do painel de opções da ferramenta.
+
+    O painel fica abaixo da grade de ferramentas.
+    A posição vertical é calculada com base na quantidade de ferramentas,
+    evitando que o painel fique sobreposto aos botões ou ao canvas.
     """
 
+    quantidade_ferramentas = len(config.FERRAMENTAS)
+    linhas_ferramentas = (quantidade_ferramentas + config.BOTAO_COLUNAS - 1) // config.BOTAO_COLUNAS
+
+    painel_x = config.BOTAO_X_INICIAL
+    painel_y = config.BOTAO_Y + linhas_ferramentas * (
+        config.BOTAO_ALTURA + config.BOTAO_ESPACAMENTO
+    ) + 4
+
+    painel_largura = config.BARRA_FERRAMENTAS_LARGURA - 8
+    painel_altura = 88
+
     return pygame.Rect(
-        config.BOTAO_X_INICIAL,
-        config.BOTAO_Y + 4 * (config.BOTAO_ALTURA + config.BOTAO_ESPACAMENTO),
-        config.BARRA_FERRAMENTAS_LARGURA - 8,
-        88
+        painel_x,
+        painel_y,
+        painel_largura,
+        painel_altura
     )
+
+def obter_botoes_tamanho_fonte():
+    """
+    Retorna os botões de tamanho da fonte alinhados 2 por 2.
+    """
+
+    painel = obter_rect_painel_opcoes()
+
+    valores = [12, 20, 28, 36]
+    botoes = []
+
+    largura_botao = 22
+    altura_botao = 14
+    espacamento_x = 4
+    espacamento_y = 3
+
+    x_inicial = painel.x + 4
+    y_inicial = painel.y + 20
+
+    for indice, valor in enumerate(valores):
+        coluna = indice % 2
+        linha = indice // 2
+
+        rect = pygame.Rect(
+            x_inicial + coluna * (largura_botao + espacamento_x),
+            y_inicial + linha * (altura_botao + espacamento_y),
+            largura_botao,
+            altura_botao
+        )
+
+        botoes.append({
+            "rect": rect,
+            "valor": valor
+        })
+
+    return botoes
 
 
 def desenhar_painel_opcoes_ferramenta(tela, estado):
     """
-    Desenha um pequeno painel decorativo abaixo dos botões, parecido com o Paint clássico.
+    Desenha o painel de opções da ferramenta atual.
+    Para texto, mostra tamanho da fonte.
+    Para as demais ferramentas, mostra espessura.
+    Para formas, mostra também preenchimento.
     """
+
+    if estado["ferramenta"] == "conta-gotas":
+        # Conta-gotas não tem opções, então só desenha o painel vazio
+        return
+    
+    if estado["ferramenta"] == "preenchimento":
+        # Balde não tem opções, então só desenha o painel vazio
+        return
 
     painel = obter_rect_painel_opcoes()
 
@@ -350,11 +478,42 @@ def desenhar_painel_opcoes_ferramenta(tela, estado):
 
     fonte = pygame.font.SysFont(None, 15)
 
-    # Texto Espessura
+    # ==========================================================
+    # Ferramenta Texto: mostra tamanho da fonte
+    # ==========================================================
+    if estado["ferramenta"] == "texto":
+        texto_fonte = fonte.render("Fonte", True, config.COR_TEXTO)
+        tela.blit(texto_fonte, (painel.x + 0, painel.y + 5))
+
+        botoes_fonte = obter_botoes_tamanho_fonte()
+
+        for botao in botoes_fonte:
+            rect = botao["rect"]
+            valor = botao["valor"]
+
+            if estado["texto_tamanho"] == valor:
+                cor = config.COR_BOTAO_PRESSIONADO
+            else:
+                cor = config.COR_BOTAO
+
+            pygame.draw.rect(tela, cor, rect)
+            pygame.draw.rect(tela, config.COR_BORDA, rect, 1)
+
+            texto_valor = fonte.render(str(valor), True, config.COR_TEXTO)
+
+            texto_x = rect.centerx - texto_valor.get_width() // 2
+            texto_y = rect.centery - texto_valor.get_height() // 2
+
+            tela.blit(texto_valor, (texto_x, texto_y))
+
+        return
+
+    # ==========================================================
+    # Demais ferramentas: mostra espessura
+    # ==========================================================
     texto_espessura = fonte.render("Espessura", True, config.COR_TEXTO)
     tela.blit(texto_espessura, (painel.x + 0, painel.y + 5))
 
-    # Botões de espessura
     botoes_espessura = obter_botoes_espessura()
 
     for botao in botoes_espessura:
@@ -376,7 +535,9 @@ def desenhar_painel_opcoes_ferramenta(tela, estado):
 
         tela.blit(texto_valor, (texto_x, texto_y))
 
-    # Botões de preenchimento aparecem somente para formas
+    # ==========================================================
+    # Retângulo e círculo: mostra opção de preenchimento
+    # ==========================================================
     if estado["ferramenta"] in ["retangulo", "circulo"]:
 
         texto_forma = fonte.render("Forma", True, config.COR_TEXTO)
@@ -404,10 +565,10 @@ def desenhar_moldura_canvas(tela):
     """
 
     moldura = pygame.Rect(
-        config.CANVAS_X - 2,
-        config.CANVAS_Y - 2,
-        config.CANVAS_LARGURA + 4,
-        config.CANVAS_ALTURA + 4
+        config.CANVAS_X ,
+        config.CANVAS_Y ,
+        config.CANVAS_LARGURA ,
+        config.CANVAS_ALTURA 
     )
 
     desenhar_borda_rebaixada(tela, moldura)
@@ -789,7 +950,7 @@ def desenhar_interface_classica(tela, estado):
     Desenha todos os elementos visuais que simulam o Paint clássico.
     """
 
-    desenhar_menu(tela)
+    desenhar_menu(tela, estado.get("menu_pressionado"))
     desenhar_area_ferramentas(tela)
     desenhar_botoes_ferramentas(tela, estado)
     desenhar_painel_opcoes_ferramenta(tela, estado)
