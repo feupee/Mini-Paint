@@ -558,17 +558,17 @@ def desenhar_painel_opcoes_ferramenta(tela, estado):
             pygame.draw.rect(tela, config.COR_BORDA, rect, 1)
 
             desenhar_icone_preenchido(tela, rect, valor)
-    
+
 def desenhar_moldura_canvas(tela):
     """
     Desenha a moldura e as barras falsas de rolagem da área de desenho.
     """
 
     moldura = pygame.Rect(
-        config.CANVAS_X ,
-        config.CANVAS_Y ,
-        config.CANVAS_LARGURA ,
-        config.CANVAS_ALTURA 
+        config.CANVAS_X,
+        config.CANVAS_Y,
+        config.CANVAS_LARGURA,
+        config.CANVAS_ALTURA
     )
 
     desenhar_borda_rebaixada(tela, moldura)
@@ -959,4 +959,3 @@ def desenhar_interface_classica(tela, estado):
     desenhar_barra_status(tela)
     desenhar_barra_superior(tela, estado)
     
-

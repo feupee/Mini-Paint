@@ -130,6 +130,10 @@ def pinta_8conectado(canvas, visitado, cor):
     for x, y in visitado:
         canvas.set_at((x, y), cor)
 
+def balde_de_tinta(canvas, ponto, cor_atual, cor_nova):
+    if cor_atual != cor_nova:
+        visitado = vizinhos_8conectado(canvas, ponto, cor_atual)
+        pinta_8conectado(canvas, visitado, cor_nova)
 
 def desenhar_retangulo(canvas, p1, p2, cor, espessura):
     x1, y1 = p1
@@ -272,3 +276,17 @@ def desenhar_retangulo_preenchido(canvas, p1, p2, cor, espessura):
             # Verifica se o pixel está dentro dos limites do canvas
             if 0 <= x < canvas.get_width() and 0 <= y < canvas.get_height():
                 canvas.set_at((x, y), cor)
+
+def desenhar_circulo_preenchido(canvas, cx, cy, raio, cor, espessura):
+    """
+    Desenha um círculo preenchido pintando todos os pixels
+    dentro do círculo usando o algoritmo de preenchimento por varredura.
+
+    Depois desenha a borda usando a função desenhar_circulo.
+    """
+
+    for y in range(cy - raio, cy + raio + 1):
+        for x in range(cx - raio, cx + raio + 1):
+            if (x - cx) ** 2 + (y - cy) ** 2 <= raio ** 2:
+                if 0 <= x < canvas.get_width() and 0 <= y < canvas.get_height():
+                    canvas.set_at((x, y), cor)

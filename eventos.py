@@ -1,7 +1,7 @@
 import pygame
 import config
 
-from algoritmos import desenhar_linha_dda, vizinhos_8conectado, pinta_8conectado, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido
+from algoritmos import desenhar_linha_dda, balde_de_tinta, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido, desenhar_circulo_preenchido
 from botao import obter_ferramenta_clicada, obter_cor_clicada, mouse_sobre_algum_botao, mouse_sobre_interface
 
 
@@ -140,13 +140,10 @@ def tratar_mouse_down(evento, estado, canvas):
             estado["ponto_inicial"] = ponto_canvas
 
         elif estado["ferramenta"] == "preenchimento":
-            ponto = ponto_canvas
-            cor_original = tuple(canvas.get_at(ponto)[:3])
+            cor_original = tuple(canvas.get_at(ponto_canvas)[:3])
             cor_nova = tuple(estado["cor_atual"][:3])
-            if cor_original != cor_nova:
-                visitado = vizinhos_8conectado(canvas, ponto, cor_original)
-                pinta_8conectado(canvas, visitado, cor_nova)
-    
+            balde_de_tinta(canvas, ponto_canvas, cor_original, cor_nova)
+
         elif estado["ferramenta"] == "conta-gotas":
             cor_clicada = canvas.get_at(ponto_canvas)
             estado["cor_atual"] = cor_clicada
@@ -252,8 +249,18 @@ def tratar_mouse_up(evento, estado, canvas):
                 espessura=1
             )
 
-        elif estado["ferramenta"] == "circulo":
+        elif estado["ferramenta"] == "circulo" and estado["preenchido"] is False:
              desenhar_circulo(
+                 canvas,
+                 estado["ponto_inicial"][0],
+                 estado["ponto_inicial"][1],
+                 max(abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]), abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])),
+                 estado["cor_atual"], 
+                 estado["espessura"]
+             )
+
+        elif estado["ferramenta"] == "circulo" and estado["preenchido"] is True:
+             desenhar_circulo_preenchido(
                  canvas,
                  estado["ponto_inicial"][0],
                  estado["ponto_inicial"][1],

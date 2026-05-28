@@ -1,6 +1,6 @@
 import pygame
 import config
-from algoritmos import desenhar_linha_dda, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido
+from algoritmos import desenhar_linha_dda, desenhar_circulo, desenhar_retangulo, desenhar_retangulo_preenchido, desenhar_circulo_preenchido
 import os
 from datetime import datetime
 
@@ -35,7 +35,8 @@ def criar_canvas_preview(canvas, estado):
         estado["ferramenta"] == "linha" and
         estado["mouse_pressionado"] and
         estado["ponto_inicial"] is not None and
-        estado["ponto_final"] is not None
+        estado["ponto_final"] is not None and
+        estado["preenchido"] is False
     ):
         # Copia o canvas original para desenhar apenas a pré-visualização.
         canvas_preview = canvas.copy()
@@ -52,8 +53,29 @@ def criar_canvas_preview(canvas, estado):
         estado["ferramenta"] == "circulo" and
         estado["mouse_pressionado"] and
         estado["ponto_inicial"] is not None and
-        estado["ponto_final"] is not None
+        estado["ponto_final"] is not None and
+        estado["preenchido"] is True
     ):
+        # Copia o canvas original para desenhar apenas a pré-visualização.
+        canvas_preview = canvas.copy()
+
+        desenhar_circulo_preenchido(
+            canvas_preview,
+            estado["ponto_inicial"][0],
+            estado["ponto_inicial"][1],
+            max(abs(estado["ponto_final"][0] - estado["ponto_inicial"][0]), abs(estado["ponto_final"][1] - estado["ponto_inicial"][1])),
+            estado["cor_atual"], 
+            estado["espessura"]
+        )
+        return canvas_preview
+
+    elif (
+            estado["ferramenta"] == "circulo" and
+            estado["mouse_pressionado"] and
+            estado["ponto_inicial"] is not None and
+            estado["ponto_final"] is not None and
+            estado["preenchido"] is False
+        ):
         # Copia o canvas original para desenhar apenas a pré-visualização.
         canvas_preview = canvas.copy()
 
