@@ -688,8 +688,7 @@ def desenhar_barra_status(tela):
     pygame.draw.line(tela, config.COR_BOTAO_BORDA_CLARA, area_status.topleft, area_status.topright)
 
     fonte = fonte_classica(12)
-    texto_ajuda = fonte.render("For Help, click Help Topics on the Help Menu.", True, config.COR_PRETO)
-    tela.blit(texto_ajuda, (6, config.STATUS_Y + 5))
+    
 
     mouse_x, mouse_y = pygame.mouse.get_pos()
     if (

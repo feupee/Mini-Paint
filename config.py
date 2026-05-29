@@ -34,7 +34,7 @@ COR_AZUL_SELECAO = (0, 0, 128)
 # Barra de menu superior
 BARRA_TITULO_ALTURA = 28
 MENU_ALTURA = 26
-MENU_OPCOES = ["New File", "Save"]
+MENU_OPCOES = ["Novo Arquivo", "Salvar"]
 
 # Espaçamentos gerais do layout.
 MARGEM_EXTERNA = 4
