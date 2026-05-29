@@ -251,10 +251,10 @@ while estado["rodando"]:
 
                     if opcao_menu == estado["menu_pressionado"]:
 
-                        if opcao_menu.lower() == "new file":
+                        if opcao_menu.lower() == "novo arquivo":
                             novo_arquivo(canvas, canvas_visual, estado)
 
-                        elif opcao_menu.lower() == "save":
+                        elif opcao_menu.lower() == "salvar":
                             caminho_salvo = salvar_canvas_png(canvas_visual)
                             print(f"Canvas salvo em: {caminho_salvo}")
 
