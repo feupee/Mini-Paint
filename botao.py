@@ -1,7 +1,6 @@
 import pygame
 import config
 
-
 # Dicionário usado para guardar imagens já carregadas
 # Isso evita carregar a mesma imagem toda hora dentro do loop principal
 imagens_cache = {}
@@ -41,7 +40,6 @@ def carregar_imagem(caminho):
 def fonte_classica(tamanho=14):
     """
     Retorna uma fonte parecida com a usada nas versões antigas do Windows.
-    Se a fonte não existir no sistema, o Pygame usa uma fonte alternativa.
     """
 
     return pygame.font.SysFont("MS Sans Serif", tamanho)
@@ -50,7 +48,6 @@ def fonte_classica(tamanho=14):
 def desenhar_borda_3d(tela, retangulo, pressionado=False):
     """
     Desenha o efeito 3D clássico do Windows 95/98.
-
     Quando pressionado=False, a borda parece elevada.
     Quando pressionado=True, a borda parece afundada.
     """
@@ -82,7 +79,6 @@ def desenhar_borda_rebaixada(tela, retangulo):
 def criar_botoes_ferramentas():
     """
     Cria os 6 botões em uma barra lateral, no estilo do Paint clássico.
-
     Cada botão recebe:
     - posição
     - tamanho
@@ -370,10 +366,10 @@ def obter_rects_menu():
         largura_texto, _ = fonte_menu.size(menu)
 
         rects_menu[menu] = pygame.Rect(
-    x_menu - 8,
-    y_menu + 2,
-    largura_texto + 11,
-    config.MENU_ALTURA - 4
+            x_menu - 8,
+            y_menu + 2,
+            largura_texto + 11,
+            config.MENU_ALTURA - 4
 )
 
         x_menu += largura_texto + 7

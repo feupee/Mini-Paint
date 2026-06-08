@@ -1,21 +1,3 @@
-"""
-Algoritmos de desenho do Mini Paint.
-
-Neste arquivo ficam as funções que trabalham sobre a matriz de inteiros do
-canvas. A matriz usa o formato:
-
-    matriz[y][x]
-
-Ou seja:
-- y representa a linha;
-- x representa a coluna;
-- cada posição guarda uma cor inteira no formato 0xRRGGBB.
-
-A Surface do Pygame pode ser passada opcionalmente para `put_pixel` apenas para
-manter a visualização atualizada. O desenho definitivo continua sendo feito na
-matriz pelos algoritmos.
-"""
-
 
 def cor_para_inteiro(cor):
     """
@@ -94,9 +76,6 @@ def put_pixel(matriz, x, y, cor, canvas_visual=None):
 
         put_pixel(x, y, cor)
 
-    A versão recebe a matriz como primeiro parâmetro porque o projeto precisa
-    saber em qual canvas o pixel será gravado.
-
     Se `canvas_visual` for informado, a Surface do Pygame também é atualizada
     naquele pixel. Isso evita converter a matriz inteira para Surface a cada
     frame e melhora o desempenho.
@@ -117,10 +96,6 @@ def put_pixel(matriz, x, y, cor, canvas_visual=None):
 def get_pixel(matriz, x, y):
     """
     Retorna a cor RGB de um pixel da matriz.
-
-    Essa é a função equivalente a:
-
-        get_pixel(x, y)
     """
 
     if not ponto_dentro_matriz(matriz, x, y):
@@ -295,7 +270,7 @@ def desenhar_circulo(matriz, cx, cy, raio, cor, espessura=1, canvas_visual=None)
 
     while x < -y:
         if p > 0:
-            y += 1
+            y += 1 
             p += 2 * (x + y) + 1
         else:
             p += 2 * x + 1
